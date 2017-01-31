@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="no-js" lang="en">
 <head>
 
   <meta charset="utf-8" />
@@ -8,12 +8,7 @@
   <title><?php echo $site->title()->html() ?> | <?php echo $page->title()->html() ?></title>
 
   <?php
-    // won't be necessary if cachebusting works as intended
-    // if ( c::get('environment') == 'development' ) {
-      echo css('assets/styles/main.css')
-    // } else {
-      // echo css('assets/styles/main.min.css')
-    // }
+    echo css('assets/styles/main.css');
   ?>
 
 </head>
