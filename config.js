@@ -1,16 +1,18 @@
 module.exports = {
   paths: {
-    source: './_posts',
-    build: '_site',
+    // source: './_posts',
+    build: 'build',
   },
   assets: {
-    source: '_resources',
-    build: '_posts/assets',
+    source: 'source',
+    build: 'build/assets',
   },
   server: {
+    proxy: '127.0.0.1:8000',
     port: 4000,
     notify: true,
     open: true,
+    online: false,
   },
   styles: {
     prefix: [
@@ -25,24 +27,6 @@ module.exports = {
     ],
   },
   scripts: {
-    webpack: {
-      watch: false,
-      // entry: {},
-      // output: {},
-      // plugins: []
-    },
-  },
-  html: {
-    minify: {
-      // For more options, see https://github.com/kangax/html-minifier
-      removeComments: true,
-      collapseWhitespace: true,
-      removeRedundantAttributes: true,
-      keepClosingSlash: true,
-      minifyCSS: true,
-      minifyJS: true,
-      collapseBooleanAttributes: true,
-      removeAttributeQuotes: true,
-    },
+    // script options go here
   },
 };
