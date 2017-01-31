@@ -1,0 +1,12 @@
+[submodule "build/kirby"]
+	path = build/kirby
+	url = https://github.com/getkirby/kirby
+[submodule "build/panel"]
+	path = build/panel
+	url = https://github.com/getkirby/panel
+[submodule "build/site/plugins/cachebuster"]
+	path = build/site/plugins/cachebuster
+	url = https://github.com/getkirby-plugins/cachebuster-plugin
+[submodule "build/site/fields/markdown"]
+	path = build/site/fields/markdown
+	url = https://github.com/JonasDoebertin/kirby-visual-markdown.git
