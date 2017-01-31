@@ -1,5 +1,6 @@
 *.log
 node_modules
+build/assets
 
 
 # System files
@@ -7,6 +8,7 @@ node_modules
 
 Icon
 .DS_Store
+
 
 # Temporary files
 # ---------------
@@ -17,6 +19,7 @@ build/thumbs/*
 build/site/cache/*
 !build/site/cache/index.html
 
+
 # -------------SECURITY-------------
 # NEVER publish these files via Git!
 # -------------SECURITY-------------
@@ -26,9 +29,3 @@ build/site/cache/*
 
 build/site/accounts/*
 !build/site/accounts/index.html
-
-# Avatars
-# ---------------
-
-build/assets/avatars/*
-!build/assets/avatars/index.html
