@@ -20,6 +20,21 @@ c::set('license', 'put your license key here');
 /*
 
 ---------------------------------------
+Development settings
+---------------------------------------
+
+Debugging mode, see here: https://getkirby.com/docs/developer-guide/troubleshooting/debugging
+Multi-environment-setup, see here: https://getkirby.com/docs/developer-guide/configuration/options
+
+*/
+
+c::set('debug', true);
+// c::set('environment', 'development');
+c::set('fingerprint', false);
+
+/*
+
+---------------------------------------
 Kirby Configuration
 ---------------------------------------
 
@@ -28,6 +43,3 @@ make Kirby work. For more fine-grained configuration
 of the system, please check out http://getkirby.com/docs/advanced/options
 
 */
-
-c::set('environment', 'production');
-c::set('cachebuster', true);
