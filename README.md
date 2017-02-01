@@ -9,12 +9,39 @@ If you just want to have a look, feel free to do so with `php -S localhost:8000`
 
 
 ## Features
-work in progress
+This boilerplate is growing fastly and already provides a solid starting point that you can build upon. For now, just check gulpfile.js or package.json to find out about all the included / planned features!
+
+Workflow:
+- Sass / node-sass / libsass
+- Webpack
+- Bourbon / Bitters
+- Image optimization
+- Minification (styles & scripts)
+- ...
+
+Kirby plugins:
+- [Visual Markdown](https://github.com/JonasDoebertin/kirby-visual-markdown)
+- [Fingerprint](https://github.com/iksi/KirbyFingerprint)
+- ...
+
+_to be continued_
 
 
 ## Getting started
-Make sure [Node.js](http://nodejs.org/) is installed on your system, then clone this repository and install its dependencies via [NPM](https://npmjs.org/).
+Make sure [Node.js](http://nodejs.org/) is installed on your system, then clone this repository (and all included submodules) and install its dependencies via [NPM](https://npmjs.org/):
 
+```bash
+$ git clone --recursive https://github.com/S1SYPHOS/Gulp-Kirby-Starter-Kit.git your-project
+$ cd your-project
+$ npm install
+```
+
+If you want to update all included submodules later on, it's just these two lines:
+
+```bash
+ $ git submodule foreach --recursive git checkout master
+ $ git submodule foreach --recursive git pull
+```
 
 ## Special Thanks
 I'd like to thank everybody that's making great software - you people are awesome. Also I'm always thankful for feedback and bug reports :)

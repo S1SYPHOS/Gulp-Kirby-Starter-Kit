@@ -1,5 +1,11 @@
 'use strict';
 
+/*
+---------------------------------------
+I. Prerequisites
+---------------------------------------
+*/
+
 var
   browserSync   = require('browser-sync').init,
   cache         = require('gulp-memory-cache'),
@@ -27,10 +33,19 @@ var
 ;
 
 
-// STYLES
 
 /*
-* `gulp lint:styles` - lints styles using stylelint (config under 'stylelint' in package.json)
+---------------------------------------
+II. Assets
+---------------------------------------
+*/
+
+
+/*
+ * 1. Styles
+ *
+ * `gulp lint:styles` - lints styles using stylelint (config under 'stylelint' in package.json)
+ * `gulp make:styles` - compiles sass into css & minifies it (production)
 */
 
 gulp.task('lint:styles', function() {
@@ -43,11 +58,6 @@ gulp.task('lint:styles', function() {
     ], {syntax: syntax_scss}))
   ;
 });
-
-
-/*
- * `gulp make:styles` - compiles sass into css & minifies it (production)
- */
 
 gulp.task('make:styles', function() {
 
@@ -78,10 +88,12 @@ gulp.task('styles', gulp.series(
 ));
 
 
-// SCRIPTS
-
 /*
+ * 2. Scripts
+ *
  * `gulp lint:scripts` - lints javascript using eslint & caches results (config under eslintConfig in package.json)
+ * `gulp make:scripts` - compiles / concatenates javascript & minifies it (production)
+ *
  */
 
 gulp.task('lint:scripts', function() {
@@ -91,11 +103,6 @@ gulp.task('lint:scripts', function() {
   .pipe(eslint())
   .pipe(eslint.format())
 });
-
-
-/*
- * `gulp make:scripts` - compiles / concatenates javascript & minifies it (production)
- */
 
 gulp.task('make:scripts', function() {
 
@@ -115,9 +122,9 @@ gulp.task('scripts', gulp.series(
 ));
 
 
-// IMAGES
-
 /*
+ * 3. Images
+ *
  * `gulp images` - compressing images (unless they already got compressed)
  */
 
@@ -135,9 +142,9 @@ gulp.task('images', function() {
 });
 
 
-// FONTS
-
 /*
+ * 4. Fonts
+ *
  * `gulp fonts`
  */
 
@@ -150,10 +157,32 @@ gulp.task('fonts', function () {
 });
 
 
-// SERVER
+/*
+ * 5. Fonts
+ *
+ * `gulp build` - compiles & collects all assets simultaneously
+ */
+
+gulp.task('build', gulp.parallel(
+  'styles',
+  'scripts',
+  'images',
+  'fonts'
+));
+
+
 
 /*
- * gulp server - starts a local development server
+---------------------------------------
+III. Development / Deployment
+---------------------------------------
+*/
+
+
+/*
+ * 1. Development Server
+ *
+ * gulp server - starts a local development server, using php & live-reload via browsersync
  */
 
 gulp.task('connect', function() {
@@ -170,10 +199,10 @@ gulp.task('server', gulp.parallel(
 ));
 
 
-// WATCH TASKS
-
 /*
- * `gulp watch` - watches for changes, recompiles & injects html + assets
+ * 2. Monitoring
+ *
+ * `gulp watch` - watches for changes, recompiles & injects assets
  */
 
 gulp.task('watch:styles', function() {
@@ -228,9 +257,10 @@ gulp.task('watch', gulp.parallel(
 ));
 
 
-// DEPLOY
 
 /*
+ * 3. Deployment
+ *
  * `gulp deploy` - pushes site content onto a remote repository
  */
 
@@ -240,17 +270,15 @@ gulp.task('watch', gulp.parallel(
  // });
 
 
-// GENERAL TASKS
 
-gulp.task('assets', gulp.parallel(
-  'styles',
-  'scripts',
-  'images',
-  'fonts'
-));
+/*
+---------------------------------------
+IV. The best of all possible worlds
+---------------------------------------
+*/
 
 gulp.task('default', gulp.series(
-  'assets',
+  'build',
   gulp.parallel(
     'server',
     'watch'
