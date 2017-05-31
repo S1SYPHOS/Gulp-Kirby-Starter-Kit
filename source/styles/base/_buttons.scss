@@ -7,7 +7,7 @@
   cursor: pointer;
   display: inline-block;
   font-family: $base-font-family;
-  font-size: $base-font-size;
+  font-size: 16px;
   -webkit-font-smoothing: antialiased;
   font-weight: 600;
   line-height: 1;
@@ -19,10 +19,14 @@
   vertical-align: middle;
   white-space: nowrap;
 
-  &:hover,
-  &:focus {
+  &:hover {
     background-color: shade($action-color, 20%);
     color: #fff;
+  }
+
+  &:focus {
+    outline: $focus-outline;
+    outline-offset: $focus-outline-offset;
   }
 
   &:disabled {

@@ -1,13 +1,12 @@
-/*
- * Importing all Sass partials
- */
-
 @import
   'vendor/bourbon/bourbon',
-  'base/variables',
-  'base/globals',
+  'vendor/neat/neat',
+  'utility/settings',
+  'utility/normalize',
+  'utility/reset',
   'base/buttons',
   'base/forms',
+  'base/layout',
   'base/lists',
   'base/media',
   'base/tables',
