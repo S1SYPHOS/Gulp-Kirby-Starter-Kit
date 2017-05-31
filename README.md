@@ -20,7 +20,7 @@ Workflow:
 - ...
 
 Kirby plugins:
-- [Visual Markdown](https://github.com/JonasDoebertin/kirby-visual-markdown)
+- ~~[Visual Markdown](https://github.com/JonasDoebertin/kirby-visual-markdown)~~
 - [Fingerprint](https://github.com/iksi/KirbyFingerprint)
 - ...
 
