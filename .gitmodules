@@ -7,3 +7,6 @@
 [submodule "build/site/plugins/fingerprint"]
 	path = build/site/plugins/fingerprint
 	url = https://github.com/iksi/KirbyFingerprint.git
+[submodule "build/site/plugins/compress"]
+	path = build/site/plugins/compress
+	url = https://github.com/iksi/kirby-compress.git
