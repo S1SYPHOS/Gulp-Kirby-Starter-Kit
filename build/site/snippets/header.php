@@ -8,6 +8,11 @@
   <title><?php echo $site->title()->html() ?> | <?php echo $page->title()->html() ?></title>
 
   <?php
+    // if you choose kirby-seo, then delete <title> tag & uncomment next line:
+    // snippet('seo')
+   ?>
+
+  <?php
     echo css('assets/styles/main.css');
   ?>
 
