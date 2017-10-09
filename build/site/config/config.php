@@ -1,5 +1,8 @@
 <?php
 
+// Be sure to read this:: https://getkirby.com/docs/installation/panel
+// c::set('panel.install', true);
+
 /*
 
 ---------------------------------------
