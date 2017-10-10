@@ -1,7 +1,14 @@
 'use strict';
 
 /*
- * Loading main js files
+ * Importing functions ..
  */
 
-require('./partials/feature-detection.js');
+import featureDetection from './partials/featureDetection';
+
+
+/*
+ * .. and executing them
+ */
+
+featureDetection();

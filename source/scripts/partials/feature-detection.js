@@ -1,5 +1,8 @@
 // Simple JS feature detection
-var className, html;
-html = document.documentElement;
-className = html.className.replace('no-js', 'js');
-html.className = className;
+export default function featureDetection() {
+  let className = '';
+  let html = '';
+  html = document.documentElement;
+  className = html.className.replace('no-js', 'js');
+  html.className = className;
+}
