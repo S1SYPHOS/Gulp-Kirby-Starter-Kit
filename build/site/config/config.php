@@ -6,23 +6,6 @@
 /*
 
 ---------------------------------------
-License Setup
----------------------------------------
-
-Please add your license key, which you've received
-via email after purchasing Kirby on http://getkirby.com/buy
-
-It is not permitted to run a public website without a
-valid license key. Please read the End User License Agreement
-for more information: http://getkirby.com/license
-
-*/
-
-c::set('license', 'put your license key here');
-
-/*
-
----------------------------------------
 Development settings
 ---------------------------------------
 
@@ -33,10 +16,8 @@ HTML Minification, see here: https://github.com/iksi/kirby-compress
 
 */
 
-// c::set('env', 'development');
+c::set('env', 'development');
 c::set('debug', true);
-// c::set('fingerprint', true);
-// c::set('plugin.compress', true);
 
 /*
 

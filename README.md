@@ -45,5 +45,7 @@ If you want to update all included submodules later on, it's just these two line
  $ git submodule foreach --recursive git pull
 ```
 
+**Note: Before publishing your project, be sure to add your production `config.php` (eg `config.example.com.php`) to .gitignore!**
+
 ## Special Thanks
 I'd like to thank everybody that's making great software - you people are awesome. Also I'm always thankful for feedback and bug reports :)
