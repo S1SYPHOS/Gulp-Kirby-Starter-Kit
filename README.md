@@ -5,7 +5,7 @@ Here's my personal (thus opinionated) Gulp+Kirby boilerplate, starring:
 - [Kirby CMS](https://getkirby.com/) - a file‑based CMS that's 'easy to setup, easy to use & flexible as hell'
 - [Gulp v4](http://gulpjs.com/) - the streaming build system
 
-If you just want to have a look, feel free to do so with `php -S localhost:8000`.
+If you just want to have a look, feel free to do so with `php -S localhost:8000`. For an even more opinionated version, have a look at [this](https://github.com/S1SYPHOS/Gulp-Kirby-Starter-Kit/tree/strong-opinion).
 
 
 ## Features
@@ -20,7 +20,6 @@ Workflow:
 - ...
 
 Pre-installed Kirby plugins:
-- ~~[Visual Markdown](https://github.com/JonasDoebertin/kirby-visual-markdown)~~
 - Fingerprinting via [kirby-fingerprint](https://github.com/iksi/KirbyFingerprint)
 - HTML Minification via [kirby-compress](https://github.com/iksi/kirby-compress)
 - (optional) SEO & SERP Preview via [kirby-seo](https://github.com/jenstornell/kirby-seo) with `git submodule add https://github.com/jenstornell/kirby-seo.git build/site/plugins/seo`
