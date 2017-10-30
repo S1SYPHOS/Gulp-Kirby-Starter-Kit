@@ -110,7 +110,7 @@ gulp.task('make:scripts', function() {
   return gulp.src(config.assets.source + '/scripts/main.js')
     .pipe(named())
     .pipe(webpack({watch: false}))
-    .pipe(babel({ presets: ['es2015'] }))
+    .pipe(babel({ presets: ['env'] }))
     .pipe(gulpif(!development, uglify()))
     .pipe(size({gzip: true, showFiles: true}))
     .pipe(gulp.dest(config.assets.build + '/scripts'))
