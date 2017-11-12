@@ -32,7 +32,7 @@ HTML Minification, see here: https://github.com/iksi/kirby-compress
 c::set('env', 'production');
 c::set('debug', false);
 c::set('cache', true);
-c::set('fingerprint', true);
+c::set('plugin.kirby-sri', true);
 c::set('plugin.compress', true);
 
 /*

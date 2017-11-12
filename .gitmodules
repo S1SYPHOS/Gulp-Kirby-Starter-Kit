@@ -4,9 +4,9 @@
 [submodule "build/panel"]
 	path = build/panel
 	url = https://github.com/getkirby/panel
-[submodule "build/site/plugins/fingerprint"]
-	path = build/site/plugins/fingerprint
-	url = https://github.com/iksi/KirbyFingerprint.git
 [submodule "build/site/plugins/compress"]
 	path = build/site/plugins/compress
 	url = https://github.com/iksi/kirby-compress.git
+[submodule "build/site/plugins/kirby-sri"]
+	path = build/site/plugins/kirby-sri
+	url = https://github.com/S1SYPHOS/kirby-sri.git

@@ -22,7 +22,7 @@ Workflow:
 - ...
 
 Pre-installed Kirby plugins:
-- Cache-busting via [kirby-fingerprint](https://github.com/iksi/KirbyFingerprint)
+- SRI hashing & Cache-busting via [kirby-sri](https://github.com/S1SYPHOS/kirby-sri)
 - HTML minification via [kirby-compress](https://github.com/iksi/kirby-compress)
 
 
