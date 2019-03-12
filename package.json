@@ -1,7 +1,7 @@
 {
   "name": "gulp-kirby-starter-kit",
-  "version": "1.1.0",
-  "description": "Gulp v4 - Kirby CMS - Starter",
+  "version": "2.0.0",
+  "description": "Getting started with Gulp v4 & Kirby in no-time",
   "author": "S1SYPHOS <hello@twobrain.io>",
   "homepage": "https://github.com/S1SYPHOS/Gulp-Kirby-Starter-Kit#readme",
   "main": "Gulpfile.js",
@@ -14,44 +14,48 @@
     "url": "https://github.com/S1SYPHOS/Gulp-Kirby-Starter-Kit/issues"
   },
   "keywords": [
-    "Gulp",
-    "Kirby"
+    "gulp",
+    "kirby",
+    "cms",
+    "starterkit"
   ],
   "scripts": {
     "start": "gulp",
     "stage": "NODE_ENV=production gulp",
     "build": "NODE_ENV=production gulp build",
     "deploy": "NODE_ENV=production gulp build && gulp deploy",
-    "check": "gulp lint:styles && gulp lint:scripts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "autoprefixer": "^7.1.6",
     "babel-core": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "browser-sync": "^2.18.7",
-    "eslint-config-google": "^0.9.1",
-    "gulp": "github:gulpjs/gulp#4.0",
+    "eslint": "^5.15.1",
+    "eslint-config-google": "^0.12.0",
+    "gulp": "^4.0.0",
+    "gulp-autoprefixer": "^6.0.0",
     "gulp-babel": "^7.0.0",
     "gulp-cached": "^1.1.1",
     "gulp-changed": "^3.1.1",
     "gulp-clean-css": "^3.9.0",
-    "gulp-connect-php": "^1.0.1",
+    "gulp-connect-php": "^1.0.3",
     "gulp-eslint": "^4.0.0",
+    "gulp-favicons": "^2.3.0",
+    "gulp-filter": "^5.1.0",
     "gulp-if": "^2.0.2",
-    "gulp-imagemin": "^3.1.1",
-    "gulp-memory-cache": "^0.3.0",
+    "gulp-imagemin": "^4.1.0",
+    "gulp-newer": "^1.4.0",
     "gulp-plumber": "^1.1.0",
-    "gulp-postcss": "^7.0.0",
-    "gulp-sass": "^3.1.0",
-    "gulp-size": "^2.1.0",
-    "gulp-stylelint": "^5.0.0",
+    "gulp-rename": "^1.4.0",
+    "gulp-sass": "^4.0.2",
+    "gulp-size": "^3.0.0",
+    "gulp-stylelint": "^8.0.0",
+    "gulp-svgmin": "^2.1.0",
+    "gulp-svgstore": "^7.0.1",
     "gulp-uglify": "^3.0.0",
     "imagemin-pngquant": "^5.0.0",
-    "postcss-reporter": "^5.0.0",
-    "postcss-scss": "^1.0.2",
-    "stylelint": "^8.2.0",
-    "stylelint-config-sass-guidelines": "^3.1.0",
+    "stylelint": "^9.10.1",
+    "stylelint-config-sass-guidelines": "^5.3.0",
     "vinyl-named": "^1.1.0",
     "webpack-stream": "^4.0.0"
   },
@@ -65,8 +69,32 @@
       "google"
     ],
     "env": {
-      "browser": true
+      "browser": true,
+      "node": true,
+      "es6": true,
+      "amd": true,
+      "commonjs": true
     },
-    "rules": {}
+    "parserOptions": {
+      "sourceType": "module"
+    },
+    "rules": {
+      "indent": [
+        "error",
+        2
+      ],
+      "max-len": [
+        "warn",
+        {
+          "ignoreComments": true
+        }
+      ],
+      "require-jsdoc": [
+        "off"
+      ],
+      "one-var": [
+        "off"
+      ]
+    }
   }
 }

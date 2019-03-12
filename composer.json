@@ -1,0 +1,27 @@
+{
+  "name": "s1syphos/gulp-kirby-starter-kit",
+  "description": "Gulp+Kirby Starterkit",
+  "type": "project",
+  "keywords": ["gulp", "kirby", "cms", "starterkit"],
+  "homepage": "https://github.com/S1SYPHOS/Gulp-Kirby-Starter-Kit#readme",
+  "authors": [
+    {
+      "name": "S1SYPHOS",
+      "email": "hello@twobrain.io",
+      "homepage": "https://twobrain.io"
+    }
+  ],
+  "support": {
+    "email": "support@twobrain.io",
+    "issues": "https://github.com/S1SYPHOS/Gulp-Kirby-Starter-Kit/issues",
+    "forum": "https://forum.getkirby.com",
+    "source": "https://github.com/S1SYPHOS/Gulp-Kirby-Starter-Kit"
+  },
+  "require": {
+    "php": ">=7.1.0",
+    "getkirby/cms": "^3.0"
+  },
+  "config": {
+    "optimize-autoloader": true
+  }
+}
