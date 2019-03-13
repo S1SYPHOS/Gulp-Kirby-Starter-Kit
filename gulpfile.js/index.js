@@ -13,8 +13,11 @@ const
   {images} = require('./tasks/images.js'),
   {fonts} = require('./tasks/fonts.js'),
   {server} = require('./tasks/server.js'),
-  {watch} = require('./tasks/watch.js')
+  {watch} = require('./tasks/watch.js'),
+
+  build = parallel(styles, scripts, images, fonts)
 ;
+
 
 /*
 ---------------------------------------
@@ -22,20 +25,18 @@ II. Bringing together the best of all possible worlds
 ---------------------------------------
 */
 
-exports.build = parallel(styles, scripts, images, fonts);
-
 module.exports = {
   styles: styles,
+  scripts: scripts,
+  images: images,
+  fonts: fonts,
+  build: build,
 
   default: series(
-    exports.build,
+    build,
     parallel(
       watch,
       server
     )
   ),
 };
-
-// exports.build = parallel(styles, scripts, images, fonts);
-//
-// exports.default = ;
