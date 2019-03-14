@@ -67,6 +67,10 @@ function createFavicons() {
 }
 
 
+/*
+ * Exports
+ */
+
 if (conf.favicons.enable && isLive) {
   exports.images = parallel(
     combineIcons,

@@ -31,6 +31,7 @@ function lintScripts() {
     .pipe(eslint.format());
 }
 
+
 /*
  * Compiles and concatenates javascript & minifies it (production)
  */
@@ -48,5 +49,9 @@ function makeScripts() {
   ;
 }
 
+
+/*
+ * Exports
+ */
 
 exports.scripts = series(lintScripts, makeScripts);

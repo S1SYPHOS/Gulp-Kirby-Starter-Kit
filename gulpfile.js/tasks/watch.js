@@ -1,6 +1,6 @@
 /*
 ---------------------------------------
-Assets - Fonts
+Monitoring
 ---------------------------------------
 */
 
@@ -43,13 +43,13 @@ function watchFonts() {
 }
 
 function watchCode() {
-  watch([
-    'site/**/*.{php,yml}',
-    'Gulpfile.js',
-    'config.js',
-  ], reload);
+  watch(conf.watch.code, reload);
 }
 
+
+/*
+ * Exports
+ */
 
 exports.watch = parallel(
   watchStyles,

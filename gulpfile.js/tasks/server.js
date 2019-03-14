@@ -18,17 +18,28 @@ const
  */
 
 function connect() {
-  php.server(conf.server);
+  php.server(conf.server.connect);
 }
+
 
 /*
  * Starts a live reload proxy via Browsersync
  */
-
 
 function livereload() {
   browserSync.init(conf.browsersync);
 }
 
 
-exports.server = parallel(connect, livereload);
+/*
+ * Exports
+ */
+
+if (conf.server.enable) {
+  exports.server = parallel(
+    connect,
+    livereload
+  );
+} else {
+  exports.server = livereload;
+}

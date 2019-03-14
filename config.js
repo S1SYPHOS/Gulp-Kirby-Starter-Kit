@@ -66,8 +66,11 @@ module.exports = {
     inline: false,
   },
   server: {
-    router: 'kirby/router.php',
-    debug: true,
+    enable: true,
+    connect: {
+      router: 'kirby/router.php',
+      debug: true,
+    },
   },
   browsersync: {
     proxy: '127.0.0.1:8000',
@@ -75,6 +78,14 @@ module.exports = {
     notify: true,
     open: true,
     online: false,
+  },
+  watch: {
+    code: [
+      'site/**/*.{php,yml}',
+      'content/**/*.txt',
+      'gulpfile.js/**/*',
+      'config.js',
+    ],
   },
   favicons: {
     enable: false,
@@ -84,6 +95,7 @@ module.exports = {
       // For more options, see https://github.com/itgalaxy/favicons
       appName: 'Gulp v4 - Kirby CMS - Starter',
       appShortName: 'Gulp+Kirby Starterkit',
+      // The following are taken from `package.json` to prevent duplicate code
       appDescription: pkg.description,
       url: pkg.homepage,
       version: pkg.version,
