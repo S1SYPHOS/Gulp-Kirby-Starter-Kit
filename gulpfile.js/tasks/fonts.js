@@ -6,7 +6,7 @@ Assets - Fonts
 
 const
   {src, dest, lastRun} = require('gulp'),
-  conf = require('../config'),
+  conf = require('../../config'),
 
   browserSync = require('browser-sync').init
 ;

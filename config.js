@@ -23,6 +23,7 @@ module.exports = {
   },
   styles: {
     linting: {
+      // For more options, see https://github.com/olegskl/gulp-stylelint#formatters
       fix: false,
       failAfterError: false,
       reporters: [{
@@ -31,6 +32,7 @@ module.exports = {
       }],
     },
     sass: {
+      // For more options, see https://github.com/sass/node-sass#options
       precision: 10, // https://github.com/sass/sass/issues/1122
       includePaths: ['node_modules'],
     },
@@ -45,7 +47,7 @@ module.exports = {
     },
   },
   scripts: {
-    input: 'main.js',
+    input: 'main.js', // Place it in your `src` + `scripts` directory
     linting: {}, // For more options, see https://github.com/adametry/gulp-eslint#eslintoptions
     webpack: {
       watch: false,
@@ -76,7 +78,7 @@ module.exports = {
   },
   favicons: {
     enable: false,
-    input: 'favicon.svg', // must be placed inside `images` directory
+    input: 'favicon.svg', // Place it in your `src` + `images` directory
     snippet: snippet,
     options: {
       // For more options, see https://github.com/itgalaxy/favicons
