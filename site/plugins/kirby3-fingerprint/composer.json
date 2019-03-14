@@ -1,0 +1,35 @@
+{
+    "name": "bnomei/kirby3-fingerprint",
+    "type": "kirby-plugin",
+    "version": "2.3.1",
+    "description": "File Method and css/js helper to add cachbusting hash and optional Subresource Integrity to file",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Bruno Meilick",
+            "email": "b@bnomei.com"
+        }
+    ],
+    "keywords": [
+        "kirby3",
+        "kirby3-cms",
+        "kirby3-plugin",
+        "fingerprint",
+        "hash",
+        "cache-buster",
+        "subresource-integrity"
+    ],
+    "autoload": {
+        "psr-4": {
+            "Bnomei\\": "classes/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "require": {
+        "php": ">=7.1.0",
+        "getkirby/composer-installer": "^1.1"
+    }
+}
