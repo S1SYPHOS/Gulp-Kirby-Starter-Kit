@@ -19,7 +19,11 @@
   },
   "require": {
     "php": ">=7.1.0",
-    "getkirby/cms": "^3.0"
+    "getkirby/cms": "^3.0",
+    "bnomei/kirby3-fingerprint": "^2.3"
+  },
+  "extra": {
+    "kirby-plugin-path": "site/plugins"
   },
   "config": {
     "optimize-autoloader": true

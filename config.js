@@ -1,6 +1,6 @@
 const
   pngquant = require('imagemin-pngquant'),
-  pkg = require('../package.json'),
+  pkg = require('./package.json'),
   src = 'source/',
   dist = 'assets/',
   snippet = 'favicon.html'
