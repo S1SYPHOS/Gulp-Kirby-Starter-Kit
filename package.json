@@ -4,7 +4,7 @@
   "description": "Getting started with Gulp v4 & Kirby in no-time",
   "author": "S1SYPHOS <hello@twobrain.io>",
   "homepage": "https://github.com/S1SYPHOS/Gulp-Kirby-Starter-Kit#readme",
-  "main": "Gulpfile.js",
+  "main": "gulpfile.js/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/S1SYPHOS/Gulp-Kirby-Starter-Kit.git"
