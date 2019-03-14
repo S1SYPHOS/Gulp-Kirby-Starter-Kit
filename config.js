@@ -68,11 +68,13 @@ module.exports = {
   server: {
     enable: true,
     connect: {
+      // For more options, see https://github.com/micahblu/gulp-connect-php#options
       router: 'kirby/router.php',
       debug: true,
     },
   },
   browsersync: {
+    // For more options, see https://browsersync.io/docs/options
     proxy: '127.0.0.1:8000',
     port: 4000,
     notify: true,
