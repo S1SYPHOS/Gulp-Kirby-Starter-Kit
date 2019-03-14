@@ -7,7 +7,9 @@ Here's my personal (thus opinionated) Gulp+Kirby boilerplate, starring:
 - [Kirby CMS v3](https://getkirby.com) - a file‑based CMS that's 'easy to setup, easy to use & flexible as hell'
 - [Gulp v4](http://gulpjs.com) - the streaming build system
 
-Although it's recommended to set up an environment closely resembling your production server (eg MAMP, XAMP, Vagrant, Valet), feel free to use PHP's built-in PHP server (default) or have a quick glance with `php -S localhost:8000 kirby/router.php`. Psst! Need the **Kirby 2 version**? Over [here](https://github.com/S1SYPHOS/Gulp-Kirby-Starter-Kit/tree/legacy).
+Although it's recommended to set up an environment closely resembling your production server (eg Docker (check out [this one](https://github.com/rasteiner/k3-dockercompose-starterkit) from @rasteiner), MAMP, Vagrant, Valet or any other LAMP-capable solution), feel free to use PHP's built-in PHP server (default) or have a quick glance with `php -S localhost:8000 kirby/router.php`.
+
+Psst! Need the **Kirby 2 version**? Over [here](https://github.com/S1SYPHOS/Gulp-Kirby-Starter-Kit/tree/legacy).
 
 ## Features
 This boilerplate provides a solid starting point that you can build upon:
