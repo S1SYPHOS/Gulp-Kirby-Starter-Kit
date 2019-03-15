@@ -25,14 +25,13 @@ Workflow:
 - ...
 
 **Table of Contents**
-- [1. Features](#features)
+- [1. Requirements](#requirements)
 - [2. Getting started](#getting-started)
-  - [2.1 Composer](#composer)
-  - [2.2 Git](#git)
 - [3. Configuration](#configuration)
-  - [Cachebusting / fingerprinting](#cache-busting--fingerprinting)
 
-
+## Requirements
+- (recommended) Local development server running PHP 7.1 (or later)
+- [Node.js](http://nodejs.org) 8 (or later) + NPM
 
 In order to keep everything neat, each task resides in [its own file](https://gulpjs.com/docs/en/getting-started/javascript-and-gulpfiles#splitting-a-gulpfile) under `tasks/`.
 
@@ -58,12 +57,16 @@ $ cd your-project
 $ npm install
 ```
 
-Now just type `npm start` and code away!
+Now just type `npm start` and code away! If you want to build for production, use `npm run build`.
 
 ## Configuration
 Tweaking the asset pipeline is pretty easy, as `config.js` comes with sensible defaults and extensive comments. Everything you need to know may be found there - otherwise open an issue and let me know!
 
-Note that rules for linting styles and scripts *are excluded from this pattern* and located in `package.json` which provides a certain flexibility:
+### Development server
+By default, this boilerplate uses PHP's built-in server. If you are using a local development server (as recommended above), just set `server.enable` to `false` and replace the default `browsersync:proxy`.
+
+### Linting styles & scripts
+Rules for linting styles and scripts *are excluded from this pattern* and located in `package.json` which provides a certain flexibility:
 
 > I prefer linting my files while editing them (supported by all major text editors (such as GitHub's [Atom](https://atom.io), Microsoft's [Visual Studio Code](https://code.visualstudio.com), (proprietary) [Sublime Text](https://www.sublimetext.com) or even Adobe's [Brackets](http://brackets.io) through plugins).
 > — S1SYPHOS
