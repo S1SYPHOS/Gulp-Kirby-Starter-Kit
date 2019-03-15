@@ -7,7 +7,7 @@ Here's my personal (thus opinionated) Gulp+Kirby boilerplate, starring:
 - [Kirby CMS v3](https://getkirby.com) - a file‑based CMS that's 'easy to setup, easy to use & flexible as hell'
 - [Gulp v4](http://gulpjs.com) - the streaming build system
 
-Although it's recommended to set up an environment closely resembling your production server (eg Docker (check out [this one](https://github.com/rasteiner/k3-dockercompose-starterkit) from @rasteiner), MAMP, Vagrant, Valet or any other LAMP-capable solution), feel free to use PHP's built-in PHP server (default) or have a quick glance with `php -S localhost:8000 kirby/router.php`.
+Although it's recommended to set up an environment closely resembling your production server (eg Docker (check out [this one](https://github.com/rasteiner/k3-dockercompose-starterkit) from @rasteiner), MAMP, Vagrant or even Valet), feel free to use PHP's built-in PHP server (default) or have a quick glance with `cd build && php -S localhost:8000 kirby/router.php`.
 
 Psst! Need the **Kirby 2 version**? Over [here](https://github.com/S1SYPHOS/Gulp-Kirby-Starter-Kit/tree/legacy).
 
@@ -34,10 +34,10 @@ Workflow:
 
 
 
-In order to keep everything neat, each task resides in [its own file](https://gulpjs.com/docs/en/getting-started/javascript-and-gulpfiles#splitting-a-gulpfile) under `gulpfile.js/tasks/`.
+In order to keep everything neat, each task resides in [its own file](https://gulpjs.com/docs/en/getting-started/javascript-and-gulpfiles#splitting-a-gulpfile) under `tasks/`.
 
-~~Pre-installed Kirby plugins:~~
-.. to be continued
+Pre-installed Kirby plugins:
+- [K3 Fingerprint](https://github.com/bnomei/kirby3-fingerprint) by @bnomei
 
 ## Getting started
 Make sure [Node.js](http://nodejs.org) is installed on your system, then clone this repository and install its dependencies via [NPM](https://npmjs.org):
@@ -71,10 +71,10 @@ Note that rules for linting styles and scripts *are excluded from this pattern* 
 There are several ways to load the configuration object for both [stylelint](https://stylelint.io/user-guide/configuration/#loading-the-configuration-object) and [ESLint](https://eslint.org/docs/user-guide/configuring#configuring-eslint).
 
 ### Cache-busting / Fingerprinting
-For [cache busting](https://www.keycdn.com/support/what-is-cache-busting) via Kirby's built-in helper functions `css()` and `js()` and bnomei's feature-rich [fingerprint plugin](https://github.com/bnomei/kirby3-fingerprint) (plus filename hash, see `site/config/config.php`), just follow the next steps:
+For [cache busting](https://www.keycdn.com/support/what-is-cache-busting) via Kirby's built-in helper functions `css()` and `js()` and bnomei's feature-rich [fingerprint plugin](https://github.com/bnomei/kirby3-fingerprint) (plus filename hash, see `build/site/config/config.php`), just follow the next steps:
 
 #### Apache
-If you're using [Apache](http://httpd.apache.org/) as your webserver and you are using a custom `.htaccess` (like this one) for improved capabilities, add the following lines right after `RewriteBase`:
+If you're using [Apache](http://httpd.apache.org/) as your webserver and you are using a custom `.htaccess` ([this](https://github.com/h5bp/server-configs-apache) should get you going) for improved capabilities, add the following lines right after `RewriteBase`:
 
 ```text
 RewriteCond %{REQUEST_FILENAME} !-f
