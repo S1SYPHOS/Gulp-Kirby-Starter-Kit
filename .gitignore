@@ -16,34 +16,19 @@ Icon
 /composer.lock
 /yarn.lock
 
+/build/media
 /build/assets
 /source/images/favicons
 /build/site/snippets/generated
-
-/build/media/*
-!/build/media/index.html
 
 # -------------SECURITY-------------
 # NEVER publish these files via Git!
 # -------------SECURITY-------------
 
-# Cache Files
+# Accounts + Cache Files + Sessions
 # ---------------
 
-/build/storage/cache/*
-!/build/storage/cache/index.html
-
-# Accounts
-# ---------------
-
-/build/storage/accounts/*
-!/build/storage/accounts/index.html
-
-# Sessions
-# ---------------
-
-/build/storage/sessions/*
-!/build/storage/sessions/index.html
+/build/storage
 
 # License
 # ---------------
