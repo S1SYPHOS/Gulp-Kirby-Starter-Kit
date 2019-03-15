@@ -8,14 +8,13 @@ I. Prerequisites
 
 const
   {series, parallel} = require('gulp'),
-  {styles} = require('./tasks/styles.js'),
-  {scripts} = require('./tasks/scripts.js'),
-  {images} = require('./tasks/images.js'),
-  {fonts} = require('./tasks/fonts.js'),
-  {server} = require('./tasks/server.js'),
-  {watch} = require('./tasks/watch.js'),
-
-  build = parallel(styles, scripts, images, fonts)
+  {styles} = require('./tasks/styles'),
+  {scripts} = require('./tasks/scripts'),
+  {images} = require('./tasks/images'),
+  {fonts} = require('./tasks/fonts'),
+  {server} = require('./tasks/server'),
+  {watch} = require('./tasks/watch'),
+  {build} = require('./tasks/build')
 ;
 
 

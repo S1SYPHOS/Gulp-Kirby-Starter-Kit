@@ -7,6 +7,7 @@ const
 ;
 
 module.exports = {
+  assets: dist,
   src: {
     styles: src + 'styles',
     scripts: src + 'scripts',
@@ -22,7 +23,6 @@ module.exports = {
     fonts: dist + 'fonts',
   },
   styles: {
-    sourcemaps: true,
     linting: {
       // For more options, see https://github.com/olegskl/gulp-stylelint#formatters
       fix: false,
@@ -48,7 +48,6 @@ module.exports = {
     },
   },
   scripts: {
-    sourcemaps: true,
     input: 'main.js', // Place it in your `src` + `scripts` directory
     linting: {}, // For more options, see https://github.com/adametry/gulp-eslint#eslintoptions
     webpack: {
@@ -76,7 +75,6 @@ module.exports = {
       base: 'build',
       // For more options, see https://github.com/micahblu/gulp-connect-php#options
       router: 'build/kirby/router.php',
-      debug: true,
     },
   },
   browsersync: {
@@ -90,10 +88,12 @@ module.exports = {
   watch: {
     code: [
       'site/**/*.{php,yml}',
-      'content/**/*.txt',
-      'gulpfile.js/**/*',
-      'config.js',
+      'content/**/*',
     ],
+  },
+  sourcemaps: {
+    enable: true,
+    path: '.', // This defaulfs to `dist` + `styles` & `dist` + `scripts`
   },
   favicons: {
     enable: false,

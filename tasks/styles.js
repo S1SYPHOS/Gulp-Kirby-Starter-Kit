@@ -14,7 +14,6 @@ const
   prefix = require('gulp-autoprefixer'),
   rename = require('gulp-rename'),
   sass = require('gulp-sass'),
-  size = require('gulp-size'),
   stylelint = require('gulp-stylelint')
 ;
 
@@ -37,11 +36,10 @@ function lintStyles() {
 */
 
 function makeStyles() {
-  return src(conf.src.styles + '/*.scss', {sourcemaps: conf.styles.sourcemaps})
+  return src(conf.src.styles + '/*.scss', {sourcemaps: conf.sourcemaps.enable})
     .pipe(sass(conf.styles.sass).on('error', sass.logError))
     .pipe(prefix(conf.styles.prefix))
-    .pipe(size({gzip: true, showFiles: true}))
-    .pipe(dest(conf.dist.styles, {sourcemaps: '.'}))
+    .pipe(dest(conf.dist.styles, {sourcemaps: conf.sourcemaps.path}))
     .pipe(browserSync.stream())
   ;
 }
@@ -52,11 +50,10 @@ function makeStyles() {
  */
 
 function minifyStyles() {
-  return src(conf.dist.styles + '/*.css')
+  return src(conf.dist.styles + '/**/*.css', {sourcemaps: conf.sourcemaps.enable})
     .pipe(minify())
     .pipe(rename({suffix: '.min'}))
-    .pipe(size({gzip: true, showFiles: true}))
-    .pipe(dest(conf.dist.styles))
+    .pipe(dest(conf.dist.styles, {sourcemaps: conf.sourcemaps.path}))
   ;
 }
 

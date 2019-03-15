@@ -13,7 +13,6 @@ const
   eslint = require('gulp-eslint'),
   named = require('vinyl-named'),
   rename = require('gulp-rename'),
-  size = require('gulp-size'),
   uglify = require('gulp-uglify'),
   webpack = require('webpack-stream')
 ;
@@ -35,26 +34,25 @@ function lintScripts() {
  */
 
 function makeScripts() {
-  return src(conf.src.scripts + '/' + conf.scripts.input, {sourcemaps: conf.scripts.sourcemaps})
+  return src(conf.src.scripts + '/' + conf.scripts.input, {sourcemaps: conf.sourcemaps.enable})
     .pipe(named())
     .pipe(webpack(conf.scripts.webpack))
     .pipe(babel(conf.scripts.babel))
-    .pipe(size({gzip: true, showFiles: true}))
-    .pipe(dest(conf.dist.scripts, {sourcemaps: '.'}))
+    .pipe(dest(conf.dist.scripts, {sourcemaps: conf.sourcemaps.path}))
     .pipe(browserSync.stream())
   ;
 }
+
 
 /*
  * Minifies javascript (only used in production)
  */
 
 function minifyScripts() {
-  return src(conf.dist.scripts + '/**/*.js')
+  return src(conf.dist.scripts + '/**/*.js', {sourcemaps: conf.sourcemaps.enable})
     .pipe(uglify())
     .pipe(rename({suffix: '.min'}))
-    .pipe(size({gzip: true, showFiles: true}))
-    .pipe(dest(conf.dist.scripts))
+    .pipe(dest(conf.dist.scripts, {sourcemaps: conf.sourcemaps.path}))
   ;
 }
 
