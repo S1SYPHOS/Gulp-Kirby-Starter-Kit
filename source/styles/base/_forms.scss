@@ -68,13 +68,13 @@ textarea {
   resize: vertical;
 }
 
-[type="checkbox"],
-[type="radio"] {
+[type='checkbox'],
+[type='radio'] {
   display: inline;
   margin-right: $small-spacing / 2;
 }
 
-[type="file"] {
+[type='file'] {
   margin-bottom: $small-spacing;
   width: 100%;
 }
@@ -84,9 +84,9 @@ select {
   width: 100%;
 }
 
-[type="checkbox"],
-[type="radio"],
-[type="file"],
+[type='checkbox'],
+[type='radio'],
+[type='file'],
 select {
   &:focus {
     outline: $focus-outline;
