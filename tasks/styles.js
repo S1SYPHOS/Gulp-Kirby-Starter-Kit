@@ -10,7 +10,6 @@ const
 
   browserSync = require('browser-sync').init,
   gulpif = require('gulp-if'),
-  isLive = (process.env.NODE_ENV) === 'production',
   minify = require('gulp-clean-css'),
   prefix = require('gulp-autoprefixer'),
   rename = require('gulp-rename'),
@@ -34,18 +33,30 @@ function lintStyles() {
 
 
 /*
- * Compiles sass into css & minifies it (production)
+ * Compiles SASS files into CSS
 */
 
 function makeStyles() {
-  return src(conf.src.styles + '/*.scss')
+  return src(conf.src.styles + '/*.scss', {sourcemaps: conf.styles.sourcemaps})
     .pipe(sass(conf.styles.sass).on('error', sass.logError))
     .pipe(prefix(conf.styles.prefix))
-    .pipe(gulpif(isLive, minify()))
-    .pipe(gulpif(isLive, rename({suffix: '.min'})))
+    .pipe(size({gzip: true, showFiles: true}))
+    .pipe(dest(conf.dist.styles, {sourcemaps: '.'}))
+    .pipe(browserSync.stream())
+  ;
+}
+
+
+/*
+ * Minifies stylesheets (only used in production)
+ */
+
+function minifyStyles() {
+  return src(conf.dist.styles + '/*.css')
+    .pipe(minify())
+    .pipe(rename({suffix: '.min'}))
     .pipe(size({gzip: true, showFiles: true}))
     .pipe(dest(conf.dist.styles))
-    .pipe(browserSync.stream())
   ;
 }
 
@@ -54,4 +65,8 @@ function makeStyles() {
  * Exports
  */
 
-exports.styles = series(lintStyles, makeStyles);
+if (process.env.NODE_ENV === 'production') {
+  exports.styles = series(makeStyles, minifyStyles);
+} else {
+  exports.styles = series(lintStyles, makeStyles);
+}

@@ -16,11 +16,16 @@ const
   browserSync = require('browser-sync').init
 ;
 
-// https://github.com/BrowserSync/browser-sync/issues/711
+
+/*
+ * See https://github.com/BrowserSync/browser-sync/issues/711
+ */
+
 function reload(done) {
   browserSync.reload();
   done();
 }
+
 
 /*
  * Watches for changes, recompiles & injects assets

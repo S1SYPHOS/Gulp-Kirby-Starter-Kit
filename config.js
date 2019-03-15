@@ -22,6 +22,7 @@ module.exports = {
     fonts: dist + 'fonts',
   },
   styles: {
+    sourcemaps: true,
     linting: {
       // For more options, see https://github.com/olegskl/gulp-stylelint#formatters
       fix: false,
@@ -47,6 +48,7 @@ module.exports = {
     },
   },
   scripts: {
+    sourcemaps: true,
     input: 'main.js', // Place it in your `src` + `scripts` directory
     linting: {}, // For more options, see https://github.com/adametry/gulp-eslint#eslintoptions
     webpack: {

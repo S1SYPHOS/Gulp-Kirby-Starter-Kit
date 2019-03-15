@@ -12,7 +12,6 @@ const
   favicons = require('gulp-favicons'),
   filter = require('gulp-filter'),
   imagemin = require('gulp-imagemin'),
-  isLive = (process.env.NODE_ENV) === 'production',
   newer = require('gulp-newer'),
   rename = require('gulp-rename'),
   size = require('gulp-size'),
@@ -52,7 +51,7 @@ function combineIcons() {
 
 
 /*
- * Generates a set of favicons (production)
+ * Generates a set of favicons (only used in production & when enabled, see `config.js#favicons.enable`)
  */
 
 function createFavicons() {
@@ -71,7 +70,7 @@ function createFavicons() {
  * Exports
  */
 
-if (conf.favicons.enable && isLive) {
+if (conf.favicons.enable && process.env.NODE_ENV === 'production') {
   exports.images = parallel(
     combineIcons,
     series(

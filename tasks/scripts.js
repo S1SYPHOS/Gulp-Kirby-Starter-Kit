@@ -11,8 +11,6 @@ const
   babel = require('gulp-babel'),
   browserSync = require('browser-sync').init,
   eslint = require('gulp-eslint'),
-  gulpif = require('gulp-if'),
-  isLive = (process.env.NODE_ENV) === 'production',
   named = require('vinyl-named'),
   rename = require('gulp-rename'),
   size = require('gulp-size'),
@@ -33,19 +31,30 @@ function lintScripts() {
 
 
 /*
- * Compiles and concatenates javascript & minifies it (production)
+ * Compiles and concatenates javascript
  */
 
 function makeScripts() {
-  return src(conf.src.scripts + '/' + conf.scripts.input)
+  return src(conf.src.scripts + '/' + conf.scripts.input, {sourcemaps: conf.scripts.sourcemaps})
     .pipe(named())
     .pipe(webpack(conf.scripts.webpack))
     .pipe(babel(conf.scripts.babel))
-    .pipe(gulpif(isLive, uglify()))
-    .pipe(gulpif(isLive, rename({suffix: '.min'})))
+    .pipe(size({gzip: true, showFiles: true}))
+    .pipe(dest(conf.dist.scripts, {sourcemaps: '.'}))
+    .pipe(browserSync.stream())
+  ;
+}
+
+/*
+ * Minifies javascript (only used in production)
+ */
+
+function minifyScripts() {
+  return src(conf.dist.scripts + '/**/*.js')
+    .pipe(uglify())
+    .pipe(rename({suffix: '.min'}))
     .pipe(size({gzip: true, showFiles: true}))
     .pipe(dest(conf.dist.scripts))
-    .pipe(browserSync.stream())
   ;
 }
 
@@ -54,4 +63,8 @@ function makeScripts() {
  * Exports
  */
 
-exports.scripts = series(lintScripts, makeScripts);
+if (process.env.NODE_ENV === 'production') {
+  exports.scripts = series(makeScripts, minifyScripts);
+} else {
+  exports.scripts = series(lintScripts, makeScripts);
+}
