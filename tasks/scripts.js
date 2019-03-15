@@ -6,7 +6,7 @@ Assets - Scripts
 
 const
   {src, dest, series, lastRun} = require('gulp'),
-  conf = require('../../config'),
+  conf = require('../config'),
 
   babel = require('gulp-babel'),
   browserSync = require('browser-sync').init,

@@ -2,7 +2,7 @@ const
   pngquant = require('imagemin-pngquant'),
   pkg = require('./package.json'),
   src = 'source/',
-  dist = 'assets/',
+  dist = 'build/assets/',
   snippet = 'favicon.html'
 ;
 
@@ -68,8 +68,9 @@ module.exports = {
   server: {
     enable: true,
     connect: {
+      base: 'build',
       // For more options, see https://github.com/micahblu/gulp-connect-php#options
-      router: 'kirby/router.php',
+      router: 'build/kirby/router.php',
       debug: true,
     },
   },

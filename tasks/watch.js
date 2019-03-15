@@ -6,7 +6,7 @@ Monitoring
 
 const
   {watch, parallel} = require('gulp'),
-  conf = require('../../config'),
+  conf = require('../config'),
 
   {styles} = require('./styles.js'),
   {scripts} = require('./scripts.js'),

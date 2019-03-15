@@ -6,7 +6,7 @@ Assets - Images & Icons
 
 const
   {src, dest, series, parallel, lastRun} = require('gulp'),
-  conf = require('../../config'),
+  conf = require('../config'),
 
   browserSync = require('browser-sync').init,
   favicons = require('gulp-favicons'),

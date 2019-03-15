@@ -16,12 +16,12 @@ Icon
 /composer.lock
 /yarn.lock
 
-/assets
+/build/assets
 /source/images/favicons
-/site/snippets/generated
+/build/site/snippets/generated
 
-/media/*
-!/media/index.html
+/build/media/*
+!/build/media/index.html
 
 # -------------SECURITY-------------
 # NEVER publish these files via Git!
@@ -30,21 +30,21 @@ Icon
 # Cache Files
 # ---------------
 
-/storage/cache/*
-!/storage/cache/index.html
+/build/storage/cache/*
+!/build/storage/cache/index.html
 
 # Accounts
 # ---------------
 
-/storage/accounts/*
-!/storage/accounts/index.html
+/build/storage/accounts/*
+!/build/storage/accounts/index.html
 
 # Sessions
 # ---------------
 
-/storage/sessions/*
-!/storage/sessions/index.html
+/build/storage/sessions/*
+!/build/storage/sessions/index.html
 
 # License
 # ---------------
-/site/config/.license
+/build/site/config/.license

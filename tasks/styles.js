@@ -6,7 +6,7 @@ Assets - Styles
 
 const
   {src, dest, series, lastRun} = require('gulp'),
-  conf = require('../../config'),
+  conf = require('../config'),
 
   browserSync = require('browser-sync').init,
   gulpif = require('gulp-if'),

@@ -6,7 +6,7 @@ Development / Deployment
 
 const
   {parallel} = require('gulp'),
-  conf = require('../../config'),
+  conf = require('../config'),
 
   browserSync = require('browser-sync').init,
   php = require('gulp-connect-php')

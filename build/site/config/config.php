@@ -10,6 +10,11 @@ of the system, please check out https://getkirby.com/docs/guide/configuration
 */
 
 return [
+  // Be sure to read this: https://getkirby.com/docs/reference/system/options/panel#allow-the-panel-to-be-installed-on-a-remote-server
+  // 'panel' =>[
+  //   'install' => true
+  // ],
+
   // Thumbnail options
   'thumbs' => require_once 'thumbs.php',
 
