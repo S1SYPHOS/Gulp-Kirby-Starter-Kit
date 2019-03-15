@@ -51,10 +51,11 @@ module.exports = {
     input: 'main.js', // Place it in your `src` + `scripts` directory
     linting: {}, // For more options, see https://github.com/adametry/gulp-eslint#eslintoptions
     webpack: {
+      mode: 'none',
       watch: false,
     },
     babel: {
-      presets: ['env'],
+      presets: ['@babel/preset-env'],
     },
   },
   images: {

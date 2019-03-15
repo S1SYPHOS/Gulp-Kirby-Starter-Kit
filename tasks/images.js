@@ -14,7 +14,6 @@ const
   imagemin = require('gulp-imagemin'),
   newer = require('gulp-newer'),
   rename = require('gulp-rename'),
-  size = require('gulp-size'),
   svg = require('gulp-svgstore'),
   svgmin = require('gulp-svgmin')
 ;
@@ -29,7 +28,6 @@ function compressImages() {
 
   return src([conf.src.images + '/**/*.{' + filetypes + '}'], {since: lastRun(compressImages)})
     .pipe(imagemin(conf.images.minify))
-    .pipe(size({showFiles: true}))
     .pipe(dest(conf.dist.images))
     .pipe(browserSync.stream())
   ;
