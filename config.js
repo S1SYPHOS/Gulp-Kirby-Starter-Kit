@@ -52,6 +52,9 @@ module.exports = {
     webpack: {
       watch: false,
     },
+    babel: {
+      presets: ['env'],
+    },
   },
   images: {
     allowed: ['png', 'jpg'],

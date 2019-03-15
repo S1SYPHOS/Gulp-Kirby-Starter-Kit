@@ -40,7 +40,7 @@ function makeScripts() {
   return src(conf.src.scripts + '/' + conf.scripts.input)
     .pipe(named())
     .pipe(webpack(conf.scripts.webpack))
-    .pipe(babel({presets: ['env']}))
+    .pipe(babel(conf.scripts.babel))
     .pipe(gulpif(isLive, uglify()))
     .pipe(gulpif(isLive, rename({suffix: '.min'})))
     .pipe(size({gzip: true, showFiles: true}))
