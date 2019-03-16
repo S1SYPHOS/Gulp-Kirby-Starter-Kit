@@ -1,7 +1,7 @@
 {
   "name": "gulp-kirby-starter-kit",
   "version": "2.0.0",
-  "description": "Getting started with Gulp v4 & Kirby in no-time",
+  "description": "Getting started with Gulp v4 & Kirby v3 in no-time",
   "author": "S1SYPHOS <hello@twobrain.io>",
   "homepage": "https://github.com/S1SYPHOS/Gulp-Kirby-Starter-Kit#readme",
   "main": "Gulpfile.js",

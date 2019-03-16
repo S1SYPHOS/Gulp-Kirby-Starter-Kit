@@ -23,8 +23,7 @@
     "bnomei/kirby3-fingerprint": "^2.3"
   },
   "extra": {
-    "kirby-cms-path": "build/kirby",
-    "kirby-plugin-path": "build/site/plugins"
+    "kirby-plugin-path": "site/plugins"
   },
   "config": {
     "optimize-autoloader": true
