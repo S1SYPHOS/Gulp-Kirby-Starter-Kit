@@ -5,9 +5,9 @@
 
 Here's my personal (thus opinionated) Gulp+Kirby boilerplate, starring:
 - [Kirby CMS v3](https://getkirby.com) - a file‑based CMS that's 'easy to setup, easy to use & flexible as hell'
-- [Gulp v4](http://gulpjs.com) - the streaming build system
+- [Gulp v4](https://gulpjs.com) - the streaming build system
 
-Although it's recommended to set up an environment closely resembling your production server (eg Docker (check out [this one](https://github.com/rasteiner/k3-dockercompose-starterkit) from @rasteiner), MAMP, Vagrant or even Valet), feel free to use PHP's built-in PHP server (default) or have a quick glance with `cd build && php -S localhost:8000 kirby/router.php`.
+Although it's recommended to set up an environment closely resembling your production server (eg Docker, MAMP, Vagrant or even Valet), feel free to use PHP's built-in development server or have a quick glance with `cd build && php -S localhost:8000 kirby/router.php`. If you are familiar with Docker, check out Gulp/Kirby StarterKit's [sister project](https://github.com/S1SYPHOS/Docker-Kirby-Starter-Kit) for a straightforward development experience.
 
 Psst! Need the **Kirby 2 version**? Over [here](https://github.com/S1SYPHOS/Gulp-Kirby-Starter-Kit/tree/legacy).
 
@@ -31,7 +31,7 @@ Workflow:
 
 ## Requirements
 - (recommended) Local development server running PHP 7.1 (or later)
-- [Node.js](http://nodejs.org) 8 (or later) + NPM
+- [Node.js](https://nodejs.org) 8 (or later) + NPM
 
 In order to keep everything neat, each task resides in [its own file](https://gulpjs.com/docs/en/getting-started/javascript-and-gulpfiles#splitting-a-gulpfile) under `tasks/`.
 
@@ -39,22 +39,17 @@ Pre-installed Kirby plugins:
 - [K3 Fingerprint](https://github.com/bnomei/kirby3-fingerprint) by @bnomei
 
 ## Getting started
-Make sure [Node.js](http://nodejs.org) is installed on your system, then clone this repository and install its dependencies via [NPM](https://npmjs.org):
+Make sure [Node.js](https://nodejs.org) is installed on your system, then clone this repository and install its dependencies via [NPM](https://npmjs.org):
 
-### Composer
+```text
+# Composer
+composer create-project s1syphos/gulp-kirby-starter-kit your-project
 
-```bash
-$ composer create-project s1syphos/gulp-kirby-starter-kit your-project
-$ cd your-project
-$ npm install
-```
+# Git
+git clone https://github.com/S1SYPHOS/Gulp-Kirby-Starter-Kit.git your-project
 
-### Git
-
-```bash
-$ git clone https://github.com/S1SYPHOS/Gulp-Kirby-Starter-Kit.git your-project
-$ cd your-project
-$ npm install
+# Installing dependencies
+cd your-project && npm install
 ```
 
 Now just type `npm start` and code away! If you want to build for production, use `npm run build`.
@@ -77,7 +72,7 @@ There are several ways to load the configuration object for both [stylelint](htt
 For [cache busting](https://www.keycdn.com/support/what-is-cache-busting) via Kirby's built-in helper functions `css()` and `js()` and bnomei's feature-rich [fingerprint plugin](https://github.com/bnomei/kirby3-fingerprint) (plus filename hash, see `build/site/config/config.php`), just follow the next steps:
 
 #### Apache
-If you're using [Apache](http://httpd.apache.org/) as your webserver and you are using a custom `.htaccess` ([this](https://github.com/h5bp/server-configs-apache) should get you going) for improved capabilities, add the following lines right after `RewriteBase`:
+If you're using [Apache](https://httpd.apache.org/) as your webserver and you are using a custom `.htaccess` ([this](https://github.com/h5bp/server-configs-apache) should get you going) for improved capabilities, add the following lines right after `RewriteBase`:
 
 ```text
 RewriteCond %{REQUEST_FILENAME} !-f
