@@ -36,7 +36,7 @@ function lintStyles() {
 */
 
 function makeStyles() {
-  return src(conf.src.styles + '/*.scss', {sourcemaps: conf.sourcemaps.enable})
+  return src(conf.src.styles + '/**/*.scss', {sourcemaps: conf.sourcemaps.enable})
     .pipe(sass(conf.styles.sass).on('error', sass.logError))
     .pipe(prefix(conf.styles.prefix))
     .pipe(dest(conf.dist.styles, {sourcemaps: conf.sourcemaps.path}))
