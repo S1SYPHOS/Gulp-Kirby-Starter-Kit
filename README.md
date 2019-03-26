@@ -21,6 +21,7 @@ Workflow:
 - Image optimization
 - SVG icon sprites
 - Favicon generation
+- Font subsetting
 - Bourbon / Bitters / Neat
 - ...
 
@@ -89,6 +90,18 @@ location /assets {
   }
 }
 ```
+
+### Self-hosting fonts
+If you already have font files (or at least one), that's great. Otherwise, there's FontSquirrel's [webfont generator](http://www.fontsquirrel.com/tools/webfont-generator) (including subsetting, file conversion, CSS generation and much more).
+
+If Google Fonts are what you want, then [this](https://github.com/majodev/google-webfonts-helper) might be helpful.
+
+After learning about [webfont strategies](https://www.zachleat.com/web/comprehensive-webfonts), you might want to subset your fonts, but rather than doing it manually (uploading, configuring, downloading, ..), let the machine handle it for you: This boilerplate supports font subsetting via [`glyphhanger`](https://github.com/filamentgroup/glyphhanger) when building for production. In order to use this feature, you have to install [`pyftsubset`](https://github.com/fonttools/fonttools) via [pip](https://pypi.org/project/pip) first:
+
+```text
+pip install fonttools
+```
+
 
 **Note: Before publishing your project, be sure to check your `.gitignore` file!**
 

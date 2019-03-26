@@ -127,4 +127,23 @@ module.exports = {
       },
     },
   },
+  subsetting: {
+    // For more options, see https://github.com/filamentgroup/glyphhanger
+    enable: true,
+    urls: [
+      // In combination with `spider: true`, this should be sufficient:
+      localURL, // Browsersync source
+      // Otherwise, add as many local/external files & URLs as you like:
+      // pkg.homepage,
+      // 'http://example.com',
+      // './example.html'
+    ],
+    formats: ['woff'], // Available formats: 'ttf', 'woff', 'woff-zopfli', 'woff2'
+    spider: false,
+    whitelist: false,
+    us_ascii: false,
+    latin: false,
+    output_css: true,
+    css_selector: false,
+  },
 };
