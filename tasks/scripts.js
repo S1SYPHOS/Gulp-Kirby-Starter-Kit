@@ -23,7 +23,11 @@ const
  */
 
 function lintScripts() {
-  return src(conf.src.scripts + '/**/*.js', {since: lastRun(lintScripts)})
+  const lintSource = [
+    conf.src.scripts + '/**/*.js',
+  ];
+
+  return src(lintSource, {since: lastRun(lintScripts)})
     .pipe(eslint(conf.scripts.linting))
     .pipe(eslint.format());
 }
@@ -34,7 +38,11 @@ function lintScripts() {
  */
 
 function makeScripts() {
-  return src(conf.src.scripts + '/' + conf.scripts.input, {sourcemaps: conf.sourcemaps.enable})
+  const scriptsSource = [
+    conf.src.scripts + '/' + conf.scripts.input,
+  ];
+
+  return src(scriptsSource, {sourcemaps: conf.sourcemaps.enable})
     .pipe(named())
     .pipe(webpack(conf.scripts.webpack))
     .pipe(babel(conf.scripts.babel))
@@ -49,7 +57,11 @@ function makeScripts() {
  */
 
 function minifyScripts() {
-  return src(conf.dist.scripts + '/**/*.js', {sourcemaps: conf.sourcemaps.enable})
+  const minifySource = [
+    conf.dist.scripts + '/**/*.js',
+  ];
+
+  return src(minifySource, {sourcemaps: conf.sourcemaps.enable})
     .pipe(uglify())
     .pipe(rename({suffix: '.min'}))
     .pipe(dest(conf.dist.scripts, {sourcemaps: conf.sourcemaps.path}))

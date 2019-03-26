@@ -8,6 +8,7 @@ I. Prerequisites
 
 const
   {series, parallel} = require('gulp'),
+
   {styles} = require('./tasks/styles'),
   {scripts} = require('./tasks/scripts'),
   {images} = require('./tasks/images'),
@@ -32,8 +33,7 @@ module.exports = {
   build: build,
 
   default: series(
-    build,
-    parallel(
+    build, parallel(
       watch,
       server
     )

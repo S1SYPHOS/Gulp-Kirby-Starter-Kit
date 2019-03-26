@@ -23,7 +23,12 @@ const
  */
 
 function lintStyles() {
-  return src([conf.src.styles + '/**/*.scss', '!' + conf.src.styles + '/vendor/**/*.scss'], {since: lastRun(lintStyles)})
+  const lintSource = [
+    conf.src.styles + '/**/*.scss',
+    '!' + conf.src.styles + '/vendor/**/*.scss',
+  ];
+
+  return src(lintSource, {since: lastRun(lintStyles)})
     // For more options, see http://stylelint.io/user-guide/example-config/
     .pipe(stylelint(conf.styles.linting))
     .pipe(gulpif(conf.styles.linting.fix == true, dest(conf.src.styles)))
@@ -36,7 +41,11 @@ function lintStyles() {
 */
 
 function makeStyles() {
-  return src(conf.src.styles + '/**/*.scss', {sourcemaps: conf.sourcemaps.enable})
+  const stylesSource = [
+    conf.src.styles + '/**/*.scss',
+  ];
+
+  return src(stylesSource, {sourcemaps: conf.sourcemaps.enable})
     .pipe(sass(conf.styles.sass).on('error', sass.logError))
     .pipe(prefix(conf.styles.prefix))
     .pipe(dest(conf.dist.styles, {sourcemaps: conf.sourcemaps.path}))
@@ -50,7 +59,11 @@ function makeStyles() {
  */
 
 function minifyStyles() {
-  return src(conf.dist.styles + '/**/*.css', {sourcemaps: conf.sourcemaps.enable})
+  const minifySource = [
+    conf.dist.styles + '/**/*.css',
+  ];
+
+  return src(minifySource, {sourcemaps: conf.sourcemaps.enable})
     .pipe(minify())
     .pipe(rename({suffix: '.min'}))
     .pipe(dest(conf.dist.styles, {sourcemaps: conf.sourcemaps.path}))

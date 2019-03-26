@@ -1,13 +1,15 @@
 const
-  pngquant = require('imagemin-pngquant'),
-  pkg = require('./package.json'),
   src = 'source/',
   dist = 'assets/',
-  snippet = 'favicon.html'
+  pkg = require('./package.json'),
+
+  localURL = '127.0.0.1:8000',
+  faviconSnippet = 'favicon.html',
+
+  pngquant = require('imagemin-pngquant')
 ;
 
 module.exports = {
-  assets: dist,
   src: {
     styles: src + 'styles',
     scripts: src + 'scripts',
@@ -70,6 +72,9 @@ module.exports = {
     output: 'icons.svg', // SVG sprite filename
     inline: false,
   },
+  fonts: {
+    allowed: ['ttf', 'woff', 'woff2'], // For example, generating from OTF without shipping source files
+  },
   server: {
     enable: true,
     connect: {
@@ -80,7 +85,7 @@ module.exports = {
   },
   browsersync: {
     // For more options, see https://browsersync.io/docs/options
-    proxy: '127.0.0.1:8000',
+    proxy: localURL,
     port: 4000,
     notify: true,
     open: true,
@@ -99,7 +104,7 @@ module.exports = {
   favicons: {
     enable: false,
     input: 'favicon.svg', // Place it in your `src` + `images` directory
-    snippet: snippet,
+    snippet: faviconSnippet,
     options: {
       // For more options, see https://github.com/itgalaxy/favicons
       appName: 'Gulp v4 - Kirby CMS - Starter',
@@ -111,7 +116,7 @@ module.exports = {
       background: '#fafafa',
       start_url: '/',
       pipeHTML: true,
-      html: '../../../site/snippets/generated/' + snippet,
+      html: '../../../site/snippets/generated/' + faviconSnippet,
       icons: {
         // By default, only `android`, `appleIcon` & `windows` are enabled
         appleStartup: false,

@@ -25,8 +25,11 @@ const
 
 function compressImages() {
   const filetypes = conf.images.allowed.join(',');
+  const imagesSource = [
+    conf.src.images + '/**/*.{' + filetypes + '}',
+  ];
 
-  return src([conf.src.images + '/**/*.{' + filetypes + '}'], {since: lastRun(compressImages)})
+  return src(imagesSource, {since: lastRun(compressImages)})
     .pipe(imagemin(conf.images.minify))
     .pipe(dest(conf.dist.images))
     .pipe(browserSync.stream())
@@ -39,7 +42,11 @@ function compressImages() {
  */
 
 function combineIcons() {
-  return src(conf.src.icons + '/**/*.svg')
+  const iconsSource = [
+    conf.src.icons + '/**/*.svg',
+  ];
+
+  return src(iconsSource)
     .pipe(newer(conf.dist.icons))
     .pipe(svgmin(conf.icons.minify))
     .pipe(svg({inlineSvg: conf.icons.inline})) // See https://github.com/w0rm/gulp-svgstore#options
@@ -54,8 +61,9 @@ function combineIcons() {
 
 function createFavicons() {
   const snippet = filter('**/' + conf.favicons.snippet, {restore: true});
+  const faviconSource = conf.src.images + '/' + conf.favicons.input;
 
-  return src(conf.src.images + '/' + conf.favicons.input)
+  return src(faviconSource)
     .pipe(favicons(conf.favicons.options))
     .pipe(snippet)
     .pipe(rename({extname: '.php'}))
@@ -71,11 +79,11 @@ function createFavicons() {
 if (conf.favicons.enable && process.env.NODE_ENV === 'production') {
   exports.images = parallel(
     combineIcons,
-    series(
-      createFavicons,
-      compressImages
-    )
+    series(createFavicons, compressImages)
   );
 } else {
-  exports.images = parallel(combineIcons, compressImages);
+  exports.images = parallel(
+    combineIcons,
+    compressImages
+  );
 }

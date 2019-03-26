@@ -6,11 +6,12 @@ Assets - Build
 
 const
   {series, parallel} = require('gulp'),
+  conf = require('../config'),
+
   {styles} = require('./styles.js'),
   {scripts} = require('./scripts.js'),
   {images} = require('./images.js'),
   {fonts} = require('./fonts.js'),
-  conf = require('../config'),
 
   del = require('del')
 ;
@@ -21,7 +22,7 @@ const
  */
 
 function clean() {
-  return del([conf.assets + '/**/*']);
+  return del(Object.values(conf.dist));
 }
 
 
@@ -30,6 +31,10 @@ function clean() {
  */
 
 exports.build = series(
-  clean,
-  parallel(styles, scripts, images, fonts)
+  clean, parallel(
+    styles,
+    scripts,
+    images,
+    fonts
+  )
 );
