@@ -87,7 +87,7 @@ function removeCSS() {
  * Exports
  */
 
-if (conf.fonts.subsetting.enable && process.env.NODE_ENV === 'production') {
+if (conf.subsetting.enable && process.env.NODE_ENV === 'production') {
   exports.fonts = parallel(
     copyFonts,
     series(subsetFonts, copyStyles, removeCSS)
