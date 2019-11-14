@@ -41,12 +41,6 @@ module.exports = {
     },
     prefix: {
       // For more options, see https://github.com/postcss/autoprefixer#options
-      browsers: [
-        // For more browsers, see https://github.com/ai/browserslist
-        '> 1%',
-        'last 3 versions',
-        'IE >= 9',
-      ],
     },
   },
   scripts: {
