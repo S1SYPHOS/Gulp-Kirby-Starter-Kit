@@ -78,5 +78,10 @@
       "require-jsdoc": ["off"],
       "one-var": ["off"]
     }
-  }
+  },
+  "browserslist": [
+    "last 3 versions",
+    "> 1%",
+    "IE >= 9"
+  ]
 }
