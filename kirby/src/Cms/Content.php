@@ -2,20 +2,18 @@
 
 namespace Kirby\Cms;
 
-use Closure;
-
 /**
  * The Content class handles all fields
  * for content from pages, the site and users
  *
  * @package   Kirby Cms
  * @author    Bastian Allgeier <bastian@getkirby.com>
- * @link      http://getkirby.com
- * @copyright Bastian Allgeier
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://getkirby.com/license
  */
 class Content
 {
-
     /**
      * The raw data array
      *
@@ -39,7 +37,7 @@ class Content
      * for testing, but field methods might
      * need it.
      *
-     * @var Page|File|User|Site
+     * @var Model
      */
     protected $parent;
 
@@ -48,9 +46,9 @@ class Content
      *
      * @param string $name
      * @param array $arguments
-     * @return Field
+     * @return \Kirby\Cms\Field
      */
-    public function __call(string $name, array $arguments = []): Field
+    public function __call(string $name, array $arguments = [])
     {
         return $this->get($name);
     }
@@ -58,10 +56,10 @@ class Content
     /**
      * Creates a new Content object
      *
-     * @param array $data
-     * @param object $parent
+     * @param array|null $data
+     * @param object|null $parent
      */
-    public function __construct($data = [], $parent = null)
+    public function __construct(array $data = [], $parent = null)
     {
         $this->data   = $data;
         $this->parent = $parent;
@@ -69,14 +67,56 @@ class Content
 
     /**
      * Same as `self::data()` to improve
-     * var_dump output
+     * `var_dump` output
      *
-     * @see    self::data()
+     * @see self::data()
      * @return array
      */
-    public function __debuginfo(): array
+    public function __debugInfo(): array
     {
         return $this->toArray();
+    }
+
+    /**
+     * Converts the content to a new blueprint
+     *
+     * @param string $to
+     * @return array
+     */
+    public function convertTo(string $to): array
+    {
+        // prepare data
+        $data    = [];
+        $content = $this;
+
+        // blueprints
+        $old       = $this->parent->blueprint();
+        $subfolder = dirname($old->name());
+        $new       = Blueprint::factory($subfolder . '/' . $to, $subfolder . '/default', $this->parent);
+
+        // forms
+        $oldForm = new Form(['fields' => $old->fields(), 'model' => $this->parent]);
+        $newForm = new Form(['fields' => $new->fields(), 'model' => $this->parent]);
+
+        // fields
+        $oldFields = $oldForm->fields();
+        $newFields = $newForm->fields();
+
+        // go through all fields of new template
+        foreach ($newFields as $newField) {
+            $name     = $newField->name();
+            $oldField = $oldFields->get($name);
+
+            // field name and type matches with old template
+            if ($oldField && $oldField->type() === $newField->type()) {
+                $data[$name] = $content->get($name)->value();
+            } else {
+                $data[$name] = $newField->default();
+            }
+        }
+
+        // preserve existing fields
+        return array_merge($this->data, $data);
     }
 
     /**
@@ -106,8 +146,8 @@ class Content
      * Returns either a single field object
      * or all registered fields
      *
-     * @param   string $key
-     * @return  Field|array
+     * @param string|null $key
+     * @return \Kirby\Cms\Field|array
      */
     public function get(string $key = null)
     {
@@ -132,7 +172,7 @@ class Content
      * Checks if a content field is set
      *
      * @param string $key
-     * @return boolean
+     * @return bool
      */
     public function has(string $key): bool
     {
@@ -157,10 +197,10 @@ class Content
      * without the fields, specified by the
      * passed key(s)
      *
-     * @param  string ...$keys
+     * @param string ...$keys
      * @return self
      */
-    public function not(...$keys): self
+    public function not(...$keys)
     {
         $copy = clone $this;
         $copy->fields = null;
@@ -176,7 +216,7 @@ class Content
      * Returns the parent
      * Site, Page, File or User object
      *
-     * @return Site|Page|File|User
+     * @return \Kirby\Cms\Model
      */
     public function parent()
     {
@@ -186,10 +226,10 @@ class Content
     /**
      * Set the parent model
      *
-     * @param Model $parent
+     * @param \Kirby\Cms\Model $parent
      * @return self
      */
-    public function setParent(Model $parent): self
+    public function setParent(Model $parent)
     {
         $this->parent = $parent;
         return $this;
@@ -198,8 +238,8 @@ class Content
     /**
      * Returns the raw data array
      *
-     * @see     self::data()
-     * @return  array
+     * @see self::data()
+     * @return array
      */
     public function toArray(): array
     {
@@ -210,13 +250,17 @@ class Content
      * Updates the content and returns
      * a cloned object
      *
-     * @param  array $content
-     * @param  bool $overwrite
+     * @param array|null $content
+     * @param bool $overwrite
      * @return self
      */
-    public function update(array $content = null, bool $overwrite = false): self
+    public function update(array $content = null, bool $overwrite = false)
     {
         $this->data = $overwrite === true ? (array)$content : array_merge($this->data, (array)$content);
+
+        // clear cache of Field objects
+        $this->fields = [];
+
         return $this;
     }
 }

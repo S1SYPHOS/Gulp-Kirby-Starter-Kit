@@ -22,16 +22,23 @@ return [
         'name' => function (Language $language) {
             return $language->name();
         },
+        'rules' => function (Language $language) {
+            return $language->rules();
+        },
         'url' => function (Language $language) {
             return $language->url();
         },
     ],
-    'type'  => Language::class,
+    'type'  => 'Kirby\Cms\Language',
     'views' => [
-        'compact' => [
+        'default' => [
             'code',
             'default',
+            'direction',
+            'locale',
             'name',
+            'rules',
+            'url'
         ]
     ]
 ];

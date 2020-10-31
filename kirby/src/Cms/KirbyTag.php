@@ -5,10 +5,15 @@ namespace Kirby\Cms;
 /**
  * Extended KirbyTag class to provide
  * common helpers for tag objects
+ *
+ * @package   Kirby Cms
+ * @author    Bastian Allgeier <bastian@getkirby.com>
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://getkirby.com/license
  */
 class KirbyTag extends \Kirby\Text\KirbyTag
 {
-
     /**
      * Finds a file for the given path.
      * The method first searches the file
@@ -16,9 +21,9 @@ class KirbyTag extends \Kirby\Text\KirbyTag
      * Afterwards it uses Kirby's global file finder.
      *
      * @param string $path
-     * @return File|null
+     * @return \Kirby\Cms\File|null
      */
-    public function file(string $path): ?File
+    public function file(string $path)
     {
         $parent = $this->parent();
 
@@ -26,7 +31,7 @@ class KirbyTag extends \Kirby\Text\KirbyTag
             return $file;
         }
 
-        if (is_a($parent, File::class) === true && $file = $parent->page()->file($path)) {
+        if (is_a($parent, 'Kirby\Cms\File') === true && $file = $parent->page()->file($path)) {
             return $file;
         }
 
@@ -36,9 +41,9 @@ class KirbyTag extends \Kirby\Text\KirbyTag
     /**
      * Returns the current Kirby instance
      *
-     * @return App
+     * @return \Kirby\Cms\App
      */
-    public function kirby(): App
+    public function kirby()
     {
         return $this->data['kirby'] ?? App::instance();
     }
@@ -46,7 +51,7 @@ class KirbyTag extends \Kirby\Text\KirbyTag
     /**
      * Returns the parent model
      *
-     * @return Page|Site|File|User
+     * @return \Kirby\Cms\Model|null
      */
     public function parent()
     {

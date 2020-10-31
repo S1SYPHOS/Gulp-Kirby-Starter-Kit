@@ -27,13 +27,16 @@ return [
             return $page->errors();
         },
         'files' => function (Page $page) {
-            return $page->files();
+            return $page->files()->sortBy('sort', 'asc', 'filename', 'asc');
         },
         'hasChildren' => function (Page $page) {
             return $page->hasChildren();
         },
         'hasDrafts' => function (Page $page) {
             return $page->hasDrafts();
+        },
+        'hasFiles' => function (Page $page) {
+            return $page->hasFiles();
         },
         'id' => function (Page $page) {
             return $page->id();
@@ -53,7 +56,7 @@ return [
             return $page->num();
         },
         'options' => function (Page $page) {
-            return $page->permissions()->toArray();
+            return $page->panelOptions(['preview']);
         },
         'panelIcon' => function (Page $page) {
             return $page->panelIcon();
@@ -101,7 +104,7 @@ return [
             return $page->url();
         },
     ],
-    'type' => Page::class,
+    'type' => 'Kirby\Cms\Page',
     'views' => [
         'compact' => [
             'id',
@@ -125,7 +128,6 @@ return [
             'id',
             'blueprint',
             'content',
-            'errors',
             'status',
             'options',
             'next'    => ['id', 'slug', 'title'],

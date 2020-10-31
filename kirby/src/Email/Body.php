@@ -11,39 +11,73 @@ use Kirby\Toolkit\Properties;
  * @package   Kirby Email
  * @author    Bastian Allgeier <bastian@getkirby.com>,
  *            Nico Hoffmann <nico@getkirby.com>
- * @link      http://getkirby.com
- * @copyright Bastian Allgeier
- * @license   MIT
-*/
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://opensource.org/licenses/MIT
+ */
 class Body
 {
     use Properties;
 
+    /**
+     * @var string|null
+     */
     protected $html;
+
+    /**
+     * @var string|null
+     */
     protected $text;
 
+    /**
+     * Email body constructor
+     *
+     * @param array $props
+     */
     public function __construct(array $props = [])
     {
         $this->setProperties($props);
     }
 
+    /**
+     * Returns the HTML content of the email body
+     *
+     * @return string|null
+     */
     public function html()
     {
         return $this->html;
     }
 
-    public function text(): string
+    /**
+     * Returns the plain text content of the email body
+     *
+     * @return string|null
+     */
+    public function text()
     {
         return $this->text;
     }
 
+    /**
+     * Sets the HTML content for the email body
+     *
+     * @param string|null $html
+     * @return self
+     */
     protected function setHtml(string $html = null)
     {
         $this->html = $html;
         return $this;
     }
 
-    protected function setText(string $text)
+    /**
+     * Sets the plain text content for the email body
+     *
+     * @param string|null $text
+     * @return self
+     */
+    protected function setText(string $text = null)
     {
         $this->text = $text;
         return $this;

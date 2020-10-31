@@ -2,7 +2,7 @@
 
 namespace Kirby\Data;
 
-use Exception;
+use Kirby\Exception\Exception;
 use Kirby\Toolkit\F;
 
 /**
@@ -12,19 +12,18 @@ use Kirby\Toolkit\F;
  *
  * @package   Kirby Data
  * @author    Bastian Allgeier <bastian@getkirby.com>
- * @link      http://getkirby.com
- * @copyright Bastian Allgeier
- * @license   MIT
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://opensource.org/licenses/MIT
  */
 abstract class Handler
 {
-
     /**
      * Parses an encoded string and returns a multi-dimensional array
      *
      * Needs to throw an Exception if the file can't be parsed.
      *
-     * @param  string $string
+     * @param mixed $string
      * @return array
      */
     abstract public static function decode($string): array;
@@ -32,20 +31,20 @@ abstract class Handler
     /**
      * Converts an array to an encoded string
      *
-     * @param  array  $data
+     * @param mixed $data
      * @return string
      */
-    abstract public static function encode(array $data): string;
+    abstract public static function encode($data): string;
 
     /**
      * Reads data from a file
      *
-     * @param  string $file
+     * @param string $file
      * @return array
      */
     public static function read(string $file): array
     {
-        if (file_exists($file) !== true) {
+        if (is_file($file) !== true) {
             throw new Exception('The file "' . $file . '" does not exist');
         }
 
@@ -53,14 +52,13 @@ abstract class Handler
     }
 
     /**
-     * Writes data to a file.
-     * The data handler is automatically chosen by
-     * the extension if not specified.
+     * Writes data to a file
      *
-     * @param  array    $data
-     * @return boolean
+     * @param string $file
+     * @param mixed $data
+     * @return bool
      */
-    public static function write(string $file = null, array $data = []): bool
+    public static function write(string $file = null, $data = []): bool
     {
         return F::write($file, static::encode($data));
     }

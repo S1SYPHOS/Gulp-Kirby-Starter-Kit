@@ -1,7 +1,7 @@
 <?php
 
-$aliases = [
-
+// @codeCoverageIgnoreStart
+return [
     // cms classes
     'asset'      => 'Kirby\Cms\Asset',
     'collection' => 'Kirby\Cms\Collection',
@@ -33,6 +33,9 @@ $aliases = [
     'database'  => 'Kirby\Database\Database',
     'db'        => 'Kirby\Database\Db',
 
+    // exceptions
+    'errorpageexception' => 'Kirby\Exception\ErrorPageException',
+
     // http classes
     'cookie'     => 'Kirby\Http\Cookie',
     'header'     => 'Kirby\Http\Header',
@@ -56,11 +59,4 @@ $aliases = [
     'v'          => 'Kirby\Toolkit\V',
     'xml'        => 'Kirby\Toolkit\Xml'
 ];
-
-spl_autoload_register(function ($class) use ($aliases) {
-    $class = strtolower($class);
-
-    if (isset($aliases[$class]) === true) {
-        class_alias($aliases[$class], $class);
-    }
-});
+// @codeCoverageIgnoreEnd

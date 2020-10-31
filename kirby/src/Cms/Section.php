@@ -5,9 +5,17 @@ namespace Kirby\Cms;
 use Kirby\Exception\InvalidArgumentException;
 use Kirby\Toolkit\Component;
 
+/**
+ * Section
+ *
+ * @package   Kirby Cms
+ * @author    Bastian Allgeier <bastian@getkirby.com>
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://getkirby.com/license
+ */
 class Section extends Component
 {
-
     /**
      * Registry for all component mixins
      *
@@ -23,6 +31,13 @@ class Section extends Component
     public static $types = [];
 
 
+    /**
+     * Section constructor.
+     *
+     * @param string $type
+     * @param array $attrs
+     * @throws \Kirby\Exception\InvalidArgumentException
+     */
     public function __construct(string $type, array $attrs = [])
     {
         if (isset($attrs['model']) === false) {
@@ -36,16 +51,25 @@ class Section extends Component
         parent::__construct($type, $attrs);
     }
 
+    /**
+     * @return \Kirby\Cms\App
+     */
     public function kirby()
     {
         return $this->model->kirby();
     }
 
+    /**
+     * @return \Kirby\Cms\Model
+     */
     public function model()
     {
         return $this->model;
     }
 
+    /**
+     * @return array
+     */
     public function toArray(): array
     {
         $array = parent::toArray();
@@ -55,6 +79,9 @@ class Section extends Component
         return $array;
     }
 
+    /**
+     * @return array
+     */
     public function toResponse(): array
     {
         return array_merge([

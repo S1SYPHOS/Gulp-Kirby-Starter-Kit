@@ -2,22 +2,49 @@
 
 namespace Kirby\Form;
 
+use Kirby\Data\Data;
 use Throwable;
-use Kirby\Toolkit\Collection;
-use Kirby\Data\Yaml;
 
 /**
  * The main form class, that is being
  * used to create a list of form fields
  * and handles global form validation
  * and submission
+ *
+ * @package   Kirby Form
+ * @author    Bastian Allgeier <bastian@getkirby.com>
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://opensource.org/licenses/MIT
  */
 class Form
 {
+    /**
+     * An array of all found errors
+     *
+     * @var array|null
+     */
     protected $errors;
+
+    /**
+     * Fields in the form
+     *
+     * @var \Kirby\Form\Fields|null
+     */
     protected $fields;
+
+    /**
+     * All values of form
+     *
+     * @var array
+     */
     protected $values = [];
 
+    /**
+     * Form constructor
+     *
+     * @param array $props
+     */
     public function __construct(array $props)
     {
         $fields = $props['fields'] ?? [];
@@ -32,7 +59,7 @@ class Form
 
         unset($inject['fields'], $inject['values'], $inject['input']);
 
-        $this->fields = new Fields;
+        $this->fields = new Fields();
         $this->values = [];
 
         foreach ($fields as $name => $props) {
@@ -54,16 +81,9 @@ class Form
             }
 
             try {
-                $field = new Field($props['type'], $props);
+                $field = new Field($props['type'], $props, $this->fields);
             } catch (Throwable $e) {
-                $props = array_merge($props, [
-                    'name'  => $props['name'],
-                    'label' => 'Error in "' . $props['name'] . '" field',
-                    'theme' => 'negative',
-                    'text'  => $e->getMessage(),
-                ]);
-
-                $field = new Field('info', $props);
+                $field = static::exceptionField($e, $props);
             }
 
             if ($field->save() !== false) {
@@ -87,13 +107,35 @@ class Form
         }
     }
 
-    public function data($defaults = false): array
+    /**
+     * Returns the data required to write to the content file
+     * Doesn't include default and null values
+     *
+     * @return array
+     */
+    public function content(): array
+    {
+        return $this->data(false, false);
+    }
+
+    /**
+     * Returns data for all fields in the form
+     *
+     * @param false $defaults
+     * @param bool $includeNulls
+     * @return array
+     */
+    public function data($defaults = false, bool $includeNulls = true): array
     {
         $data = $this->values;
 
         foreach ($this->fields as $field) {
             if ($field->save() === false || $field->unset() === true) {
-                $data[$field->name()] = null;
+                if ($includeNulls === true) {
+                    $data[$field->name()] = null;
+                } else {
+                    unset($data[$field->name()]);
+                }
             } else {
                 $data[$field->name()] = $field->data($defaults);
             }
@@ -102,6 +144,11 @@ class Form
         return $data;
     }
 
+    /**
+     * An array of all found errors
+     *
+     * @return array
+     */
     public function errors(): array
     {
         if ($this->errors !== null) {
@@ -122,21 +169,60 @@ class Form
         return $this->errors;
     }
 
+    /**
+     * Shows the error with the field
+     *
+     * @param \Throwable $exception
+     * @param array $props
+     * @return \Kirby\Form\Field
+     */
+    public static function exceptionField(Throwable $exception, array $props = [])
+    {
+        $props = array_merge($props, [
+            'label' => 'Error in "' . $props['name'] . '" field',
+            'theme' => 'negative',
+            'text'  => strip_tags($exception->getMessage()),
+        ]);
+
+        return new Field('info', $props);
+    }
+
+    /**
+     * Returns form fields
+     *
+     * @return \Kirby\Form\Fields|null
+     */
     public function fields()
     {
         return $this->fields;
     }
 
+    /**
+     * Checks if the form is invalid
+     *
+     * @return bool
+     */
     public function isInvalid(): bool
     {
         return empty($this->errors()) === false;
     }
 
+    /**
+     * Checks if the form is valid
+     *
+     * @return bool
+     */
     public function isValid(): bool
     {
         return empty($this->errors()) === true;
     }
 
+    /**
+     * Converts the data of fields to strings
+     *
+     * @param false $defaults
+     * @return array
+     */
     public function strings($defaults = false): array
     {
         $strings = [];
@@ -145,7 +231,7 @@ class Form
             if ($value === null) {
                 $strings[$key] = null;
             } elseif (is_array($value) === true) {
-                $strings[$key] = Yaml::encode($value);
+                $strings[$key] = Data::encode($value, 'yaml');
             } else {
                 $strings[$key] = $value;
             }
@@ -154,7 +240,12 @@ class Form
         return $strings;
     }
 
-    public function toArray()
+    /**
+     * Converts the form to a plain array
+     *
+     * @return array
+     */
+    public function toArray(): array
     {
         $array = [
             'errors' => $this->errors(),
@@ -167,6 +258,11 @@ class Form
         return $array;
     }
 
+    /**
+     * Returns form values
+     *
+     * @return array
+     */
     public function values(): array
     {
         return $this->values;

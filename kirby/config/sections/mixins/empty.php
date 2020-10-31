@@ -1,5 +1,7 @@
 <?php
 
+use Kirby\Toolkit\I18n;
+
 return [
     'props' => [
         /**
@@ -9,20 +11,11 @@ return [
             return I18n::translate($empty, $empty);
         }
     ],
-    'methods' => [
-        'isFull' => function () {
-            if ($this->max) {
-                return $this->total >= $this->max;
+    'computed' => [
+        'empty' => function () {
+            if ($this->empty) {
+                return $this->model()->toString($this->empty);
             }
-
-            return false;
-        },
-        'validateMax' => function () {
-            if ($this->max && $this->max < $this->total) {
-                return false;
-            }
-
-            return true;
         }
     ]
 ];

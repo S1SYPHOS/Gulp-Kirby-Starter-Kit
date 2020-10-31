@@ -2,17 +2,20 @@
 
 namespace Kirby\Cms;
 
-use Closure;
-
 /**
  * The Ingredients class is the foundation for
- * $kirby->urls() and $kirby->roots() objects.
+ * `$kirby->urls()` and `$kirby->roots()` objects.
  * Those are configured in `kirby/config/urls.php`
  * and `kirby/config/roots.php`
+ *
+ * @package   Kirby Cms
+ * @author    Bastian Allgeier <bastian@getkirby.com>
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://getkirby.com/license
  */
 class Ingredients
 {
-
     /**
      * @var array
      */
@@ -32,7 +35,7 @@ class Ingredients
      * Magic getter for single ingredients
      *
      * @param string $method
-     * @param array $args
+     * @param array|null $args
      * @return mixed
      */
     public function __call(string $method, array $args = null)
@@ -41,11 +44,11 @@ class Ingredients
     }
 
     /**
-     * Improved var_dump output
+     * Improved `var_dump` output
      *
      * @return array
      */
-    public function __debuginfo(): array
+    public function __debugInfo(): array
     {
         return $this->ingredients;
     }
@@ -69,7 +72,7 @@ class Ingredients
      * @param array $ingredients
      * @return self
      */
-    public static function bake(array $ingredients): self
+    public static function bake(array $ingredients)
     {
         foreach ($ingredients as $name => $ingredient) {
             if (is_a($ingredient, 'Closure') === true) {

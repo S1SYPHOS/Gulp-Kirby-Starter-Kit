@@ -1,6 +1,5 @@
 <?php
 
-use Kirby\Cms\App;
 use Kirby\Cms\Html;
 use Kirby\Cms\Url;
 
@@ -9,7 +8,9 @@ use Kirby\Cms\Url;
  */
 return [
 
-    /* Date */
+    /**
+     * Date
+     */
     'date' => [
         'attr' => [],
         'html' => function ($tag) {
@@ -17,7 +18,9 @@ return [
         }
     ],
 
-    /* Email */
+    /**
+     * Email
+     */
     'email' => [
         'attr' => [
             'class',
@@ -36,10 +39,13 @@ return [
         }
     ],
 
-    /* File */
+    /**
+     * File
+     */
     'file' => [
         'attr' => [
             'class',
+            'download',
             'rel',
             'target',
             'text',
@@ -58,7 +64,7 @@ return [
 
             return Html::a($file->url(), $tag->text, [
                 'class'    => $tag->class,
-                'download' => true,
+                'download' => $tag->download !== 'false',
                 'rel'      => $tag->rel,
                 'target'   => $tag->target,
                 'title'    => $tag->title,
@@ -66,7 +72,9 @@ return [
         }
     ],
 
-    /* Gist */
+    /**
+     * Gist
+     */
     'gist' => [
         'attr' => [
             'file'
@@ -76,7 +84,9 @@ return [
         }
     ],
 
-    /* Image */
+    /**
+     * Image
+     */
     'image' => [
         'attr' => [
             'alt',
@@ -88,7 +98,6 @@ return [
             'linkclass',
             'rel',
             'target',
-            'text',
             'title',
             'width'
         ],
@@ -107,7 +116,13 @@ return [
                     return $img;
                 }
 
-                return Html::a($tag->link === 'self' ? $tag->src : $tag->link, [$img], [
+                if ($link = $tag->file($tag->link)) {
+                    $link = $link->url();
+                } else {
+                    $link = $tag->link === 'self' ? $tag->src : $tag->link;
+                }
+
+                return Html::a($link, [$img], [
                     'rel'    => $tag->rel,
                     'class'  => $tag->linkclass,
                     'target' => $tag->target
@@ -126,13 +141,20 @@ return [
                 return $link($image);
             }
 
+            // render KirbyText in caption
+            if ($tag->caption) {
+                $tag->caption = [$tag->kirby()->kirbytext($tag->caption, [], true)];
+            }
+
             return Html::figure([ $link($image) ], $tag->caption, [
                 'class' => $tag->class
             ]);
         }
     ],
 
-    /* Link */
+    /**
+     * Link
+     */
     'link' => [
         'attr' => [
             'class',
@@ -158,7 +180,9 @@ return [
         }
     ],
 
-    /* Tel */
+    /**
+     * Tel
+     */
     'tel' => [
         'attr' => [
             'class',
@@ -175,7 +199,9 @@ return [
         }
     ],
 
-    /* Twitter */
+    /**
+     * Twitter
+     */
     'twitter' => [
         'attr' => [
             'class',
@@ -205,7 +231,9 @@ return [
         }
     ],
 
-    /* Video */
+    /**
+     * Video
+     */
     'video' => [
         'attr' => [
             'class',
@@ -216,13 +244,15 @@ return [
         'html' => function ($tag) {
             $video = Html::video(
                 $tag->value,
-                $tag->kirby()->option('kirbytext.video.options', [])
+                $tag->kirby()->option('kirbytext.video.options', []),
+                [
+                    'height' => $tag->height ?? $tag->kirby()->option('kirbytext.video.height'),
+                    'width'  => $tag->width  ?? $tag->kirby()->option('kirbytext.video.width'),
+                ]
             );
 
             return Html::figure([$video], $tag->caption, [
-                'class'  => $tag->class  ?? $tag->kirby()->option('kirbytext.video.class', 'video'),
-                'height' => $tag->height ?? $tag->kirby()->option('kirbytext.video.height'),
-                'width'  => $tag->width  ?? $tag->kirby()->option('kirbytext.video.width'),
+                'class' => $tag->class  ?? $tag->kirby()->option('kirbytext.video.class', 'video'),
             ]);
         }
     ],

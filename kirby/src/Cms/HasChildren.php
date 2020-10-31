@@ -4,27 +4,35 @@ namespace Kirby\Cms;
 
 use Kirby\Toolkit\Str;
 
+/**
+ * HasChildren
+ *
+ * @package   Kirby Cms
+ * @author    Bastian Allgeier <bastian@getkirby.com>
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://getkirby.com/license
+ */
 trait HasChildren
 {
-
     /**
      * The Pages collection
      *
-     * @var Pages
+     * @var \Kirby\Cms\Pages
      */
     public $children;
 
     /**
      * The list of available drafts
      *
-     * @var Pages
+     * @var \Kirby\Cms\Pages
      */
     public $drafts;
 
     /**
      * Returns the Pages collection
      *
-     * @return Pages
+     * @return \Kirby\Cms\Pages
      */
     public function children()
     {
@@ -38,7 +46,7 @@ trait HasChildren
     /**
      * Returns all children and drafts at the same time
      *
-     * @return Pages
+     * @return \Kirby\Cms\Pages
      */
     public function childrenAndDrafts()
     {
@@ -60,7 +68,7 @@ trait HasChildren
      * Searches for a child draft by id
      *
      * @param string $path
-     * @return Page|null
+     * @return \Kirby\Cms\Page|null
      */
     public function draft(string $path)
     {
@@ -93,7 +101,7 @@ trait HasChildren
     /**
      * Return all drafts of the model
      *
-     * @return Pages
+     * @return \Kirby\Cms\Pages
      */
     public function drafts()
     {
@@ -118,7 +126,7 @@ trait HasChildren
      * Finds one or multiple children by id
      *
      * @param string ...$arguments
-     * @return Pages
+     * @return \Kirby\Cms\Page|\Kirby\Cms\Pages|null
      */
     public function find(...$arguments)
     {
@@ -128,7 +136,8 @@ trait HasChildren
     /**
      * Finds a single page or draft
      *
-     * @return Page|null
+     * @param string $path
+     * @return \Kirby\Cms\Page|null
      */
     public function findPageOrDraft(string $path)
     {
@@ -138,9 +147,9 @@ trait HasChildren
     /**
      * Returns a collection of all children of children
      *
-     * @return Pages
+     * @return \Kirby\Cms\Pages
      */
-    public function grandChildren(): Pages
+    public function grandChildren()
     {
         return $this->children()->children();
     }
@@ -148,7 +157,7 @@ trait HasChildren
     /**
      * Checks if the model has any children
      *
-     * @return boolean
+     * @return bool
      */
     public function hasChildren(): bool
     {
@@ -158,7 +167,7 @@ trait HasChildren
     /**
      * Checks if the model has any drafts
      *
-     * @return boolean
+     * @return bool
      */
     public function hasDrafts(): bool
     {
@@ -166,18 +175,21 @@ trait HasChildren
     }
 
     /**
-     * @deprecated 3.0.0 Use `Page::hasUnlistedChildren` instead
-     * @return boolean
+     * @deprecated 3.0.0 Use `Page::hasUnlistedChildren()` instead
+     * @return bool
+     * @codeCoverageIgnore
      */
     public function hasInvisibleChildren(): bool
     {
-        return $this->children()->invisible()->count() > 0;
+        deprecated('$page->hasInvisibleChildren() is deprecated, use $page->hasUnlistedChildren() instead. $page->hasInvisibleChildren() will be removed in Kirby 3.5.0.');
+
+        return $this->hasUnlistedChildren();
     }
 
     /**
      * Checks if the page has any listed children
      *
-     * @return boolean
+     * @return bool
      */
     public function hasListedChildren(): bool
     {
@@ -187,7 +199,7 @@ trait HasChildren
     /**
      * Checks if the page has any unlisted children
      *
-     * @return boolean
+     * @return bool
      */
     public function hasUnlistedChildren(): bool
     {
@@ -195,21 +207,24 @@ trait HasChildren
     }
 
     /**
-     * @deprecated 3.0.0 Use `Page::hasListedChildren` instead
-     * @return boolean
+     * @deprecated 3.0.0 Use `Page::hasListedChildren()` instead
+     * @return bool
+     * @codeCoverageIgnore
      */
     public function hasVisibleChildren(): bool
     {
-        return $this->children()->listed()->count() > 0;
+        deprecated('$page->hasVisibleChildren() is deprecated, use $page->hasListedChildren() instead. $page->hasVisibleChildren() will be removed in Kirby 3.5.0.');
+
+        return $this->hasListedChildren();
     }
 
     /**
      * Creates a flat child index
      *
      * @param bool $drafts
-     * @return Pages
+     * @return \Kirby\Cms\Pages
      */
-    public function index(bool $drafts = false): Pages
+    public function index(bool $drafts = false)
     {
         if ($drafts === true) {
             return $this->childrenAndDrafts()->index($drafts);

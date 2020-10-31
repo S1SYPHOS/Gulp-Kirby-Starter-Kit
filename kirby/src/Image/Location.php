@@ -3,18 +3,17 @@
 namespace Kirby\Image;
 
 /**
-* Returns the latitude and longitude values
-* for exif location data if available
-*
-* @package   Kirby Toolkit
-* @author    Bastian Allgeier <bastian@getkirby.com>
-* @link      http://getkirby.com
-* @copyright Bastian Allgeier
-* @license   MIT
-*/
+ * Returns the latitude and longitude values
+ * for exif location data if available
+ *
+ * @package   Kirby Image
+ * @author    Bastian Allgeier <bastian@getkirby.com>
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://opensource.org/licenses/MIT
+ */
 class Location
 {
-
     /**
      * latitude
      *
@@ -69,8 +68,8 @@ class Location
     /**
      * Converts the gps coordinates
      *
-     * @param  string|array $coord
-     * @param  string       $hemi
+     * @param string|array $coord
+     * @param string $hemi
      * @return float
      */
     protected function gps($coord, string $hemi): float
@@ -88,7 +87,7 @@ class Location
     /**
      * Converts coordinates to floats
      *
-     * @param  string $part
+     * @param string $part
      * @return float
      */
     protected function num(string $part): float
@@ -99,7 +98,7 @@ class Location
             return $parts[0];
         }
 
-        return floatval($parts[0]) / floatval($parts[1]);
+        return (float)($parts[0]) / (float)($parts[1]);
     }
 
     /**
@@ -126,11 +125,11 @@ class Location
     }
 
     /**
-     * Improved var_dump() output
+     * Improved `var_dump` output
      *
      * @return array
      */
-    public function __debuginfo(): array
+    public function __debugInfo(): array
     {
         return $this->toArray();
     }

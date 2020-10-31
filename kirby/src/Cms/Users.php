@@ -3,6 +3,7 @@
 namespace Kirby\Cms;
 
 use Kirby\Toolkit\Dir;
+use Kirby\Toolkit\F;
 use Kirby\Toolkit\Str;
 
 /**
@@ -13,11 +14,19 @@ use Kirby\Toolkit\Str;
  *
  * @package   Kirby Cms
  * @author    Bastian Allgeier <bastian@getkirby.com>
- * @link      http://getkirby.com
- * @copyright Bastian Allgeier
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://getkirby.com/license
  */
 class Users extends Collection
 {
+    /**
+     * All registered users methods
+     *
+     * @var array
+     */
+    public static $methods = [];
+
     public function create(array $data)
     {
         return User::create($data);
@@ -28,8 +37,8 @@ class Users extends Collection
      * an entire second collection to the
      * current collection
      *
-     * @param mixed $item
-     * @return Users
+     * @param mixed $object
+     * @return self
      */
     public function add($object)
     {
@@ -42,7 +51,7 @@ class Users extends Collection
             $this->__set($user->id(), $user);
 
         // add a user object
-        } elseif (is_a($object, User::class) === true) {
+        } elseif (is_a($object, 'Kirby\Cms\User') === true) {
             $this->__set($object->id(), $object);
         }
 
@@ -56,13 +65,13 @@ class Users extends Collection
      * @param array $inject
      * @return self
      */
-    public static function factory(array $users, array $inject = []): self
+    public static function factory(array $users, array $inject = [])
     {
-        $collection = new static;
+        $collection = new static();
 
         // read all user blueprints
         foreach ($users as $props) {
-            $user = new User($props + $inject);
+            $user = User::factory($props + $inject);
             $collection->set($user->id(), $user);
         }
 
@@ -73,12 +82,12 @@ class Users extends Collection
      * Finds a user in the collection by id or email address
      *
      * @param string $key
-     * @return User|null
+     * @return \Kirby\Cms\User|null
      */
-    public function findByKey($key)
+    public function findByKey(string $key)
     {
         if (Str::contains($key, '@') === true) {
-            return parent::findBy('email', $key);
+            return parent::findBy('email', Str::lower($key));
         }
 
         return parent::findByKey($key);
@@ -91,22 +100,41 @@ class Users extends Collection
      * @param array $inject
      * @return self
      */
-    public static function load(string $root, array $inject = []): self
+    public static function load(string $root, array $inject = [])
     {
-        $users = new static;
+        $users = new static();
 
         foreach (Dir::read($root) as $userDirectory) {
             if (is_dir($root . '/' . $userDirectory) === false) {
                 continue;
             }
 
-            $user = new User([
-                'id' => $userDirectory,
+            // get role information
+            $path = $root . '/' . $userDirectory . '/index.php';
+            if (is_file($path) === true) {
+                $credentials = F::load($path);
+            }
+
+            // create user model based on role
+            $user = User::factory([
+                'id'    => $userDirectory,
+                'model' => $credentials['role'] ?? null
             ] + $inject);
 
             $users->set($user->id(), $user);
         }
 
         return $users;
+    }
+
+    /**
+     * Shortcut for `$users->filterBy('role', 'admin')`
+     *
+     * @param string $role
+     * @return self
+     */
+    public function role(string $role)
+    {
+        return $this->filterBy('role', $role);
     }
 }

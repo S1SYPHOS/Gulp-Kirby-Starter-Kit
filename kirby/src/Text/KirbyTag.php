@@ -2,12 +2,17 @@
 
 namespace Kirby\Text;
 
-use Closure;
-use Kirby\Exception\InvalidArgumentException;
 use Kirby\Exception\BadMethodCallException;
+use Kirby\Exception\InvalidArgumentException;
 
 /**
  * Representation and parse of a single KirbyTag.
+ *
+ * @package   Kirby Text
+ * @author    Bastian Allgeier <bastian@getkirby.com>
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://opensource.org/licenses/MIT
  */
 class KirbyTag
 {
@@ -41,6 +46,7 @@ class KirbyTag
         }
 
         foreach ($attrs as $attrName => $attrValue) {
+            $attrName = strtolower($attrName);
             $this->$attrName = $attrValue;
         }
 
@@ -54,11 +60,13 @@ class KirbyTag
 
     public function __get(string $attr)
     {
-        return null;
+        $attr = strtolower($attr);
+        return $this->$attr ?? null;
     }
 
     public function attr(string $name, $default = null)
     {
+        $name = strtolower($name);
         return $this->$name ?? $default;
     }
 
@@ -67,11 +75,25 @@ class KirbyTag
         return (new static(...$arguments))->render();
     }
 
-    public static function parse(string $string, array $data = [], array $options = []): self
+    /**
+     * @param string $string
+     * @param array $data
+     * @param array $options
+     * @return self
+     */
+    public static function parse(string $string, array $data = [], array $options = [])
     {
         // remove the brackets, extract the first attribute (the tag type)
-        $tag  = trim(rtrim(ltrim($string, '('), ')'));
+        $tag  = trim(ltrim($string, '('));
+
+        // use substr instead of rtrim to keep non-tagged brackets
+        // (link: file.pdf text: Download (PDF))
+        if (substr($tag, -1) === ')') {
+            $tag = substr($tag, 0, -1);
+        }
+
         $type = trim(substr($tag, 0, strpos($tag, ':')));
+        $type = strtolower($type);
         $attr = static::$types[$type]['attr'] ?? [];
 
         // the type should be parsed as an attribute, so we add it here
@@ -113,7 +135,7 @@ class KirbyTag
     {
         $callback = static::$types[$this->type]['html'] ?? null;
 
-        if (is_a($callback, Closure::class) === true) {
+        if (is_a($callback, 'Closure') === true) {
             return (string)$callback($this);
         }
 

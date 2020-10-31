@@ -18,12 +18,10 @@
     "source": "https://github.com/S1SYPHOS/Gulp-Kirby-Starter-Kit"
   },
   "require": {
-    "php": ">=7.1.0",
-    "getkirby/cms": "^3.1",
-    "bnomei/kirby3-fingerprint": "^2.3"
-  },
-  "extra": {
-    "kirby-plugin-path": "site/plugins"
+    "php": ">=7.2.0",
+    "getkirby/cms": "^3.4",
+    "afbora/kirby-minify-html": "^1.2",
+    "bnomei/kirby3-fingerprint": "^3.0"
   },
   "config": {
     "optimize-autoloader": true

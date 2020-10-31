@@ -5,16 +5,19 @@ namespace Kirby\Cms;
 use Exception;
 use Kirby\Toolkit\F;
 use Kirby\Toolkit\Tpl;
-use Kirby\Toolkit\View;
-use Throwable;
 
 /**
  * Represents a Kirby template and takes care
  * of loading the correct file.
+ *
+ * @package   Kirby Cms
+ * @author    Bastian Allgeier <bastian@getkirby.com>
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://getkirby.com/license
  */
 class Template
 {
-
     /**
      * Global template data
      *
@@ -71,7 +74,7 @@ class Template
     /**
      * Checks if the template exists
      *
-     * @return boolean
+     * @return bool
      */
     public function exists(): bool
     {
@@ -122,7 +125,7 @@ class Template
                 // Try the default template in the default template directory.
                 return F::realpath($this->root() . '/' . $this->name() . '.' . $this->extension(), $this->root());
             } catch (Exception $e) {
-                //
+                // ignore errors, continue searching
             }
 
             // Look for the default template provided by an extension.
@@ -187,7 +190,7 @@ class Template
     /**
      * Checks if the template uses the default type
      *
-     * @return boolean
+     * @return bool
      */
     public function hasDefaultType(): bool
     {

@@ -14,17 +14,17 @@ use Kirby\Exception\InvalidArgumentException;
  *
  * @package   Kirby Cms
  * @author    Bastian Allgeier <bastian@getkirby.com>
- * @link      http://getkirby.com
- * @copyright Bastian Allgeier
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://getkirby.com/license
  */
 class Structure extends Collection
 {
-
     /**
      * Creates a new Collection with the given objects
      *
      * @param array $objects
-     * @param object $parent
+     * @param object|null $parent
      */
     public function __construct($objects = [], $parent = null)
     {
@@ -39,13 +39,18 @@ class Structure extends Collection
      * StructureObjects
      *
      * @param string $id
-     * @param array|StructureObject $object
+     * @param array|StructureObject $props
+     * @throws \Kirby\Exception\InvalidArgumentException
      */
     public function __set(string $id, $props)
     {
-        if (is_a($props, StructureObject::class) === true) {
+        if (is_a($props, 'Kirby\Cms\StructureObject') === true) {
             $object = $props;
         } else {
+            if (is_array($props) === false) {
+                throw new InvalidArgumentException('Invalid structure data');
+            }
+
             $object = new StructureObject([
                 'content'    => $props,
                 'id'         => $props['id'] ?? $id,

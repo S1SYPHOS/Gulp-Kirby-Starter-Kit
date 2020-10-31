@@ -1,7 +1,5 @@
 <?php
 
-use Kirby\Exception\InvalidArgumentException;
-
 /**
  * Files Routes
  */
@@ -29,7 +27,7 @@ return [
         'pattern' => '(:all)/files',
         'method'  => 'GET',
         'action'  => function (string $path) {
-            return $this->parent($path)->files();
+            return $this->parent($path)->files()->sortBy('sort', 'asc', 'filename', 'asc');
         }
     ],
     [
@@ -62,7 +60,10 @@ return [
         'pattern' => '(:all)/files/sort',
         'method'  => 'PATCH',
         'action'  => function (string $path) {
-            return $this->parent($path)->files()->changeSort($this->requestBody('files'));
+            return $this->parent($path)->files()->changeSort(
+                $this->requestBody('files'),
+                $this->requestBody('index')
+            );
         }
     ],
     [
@@ -102,5 +103,21 @@ return [
             return $this->file($path, $filename)->changeName($this->requestBody('name'));
         }
     ],
+    [
+        'pattern' => 'files/search',
+        'method'  => 'GET|POST',
+        'action'  => function () {
+            $files = $this
+                ->site()
+                ->index(true)
+                ->filterBy('isReadable', true)
+                ->files();
 
+            if ($this->requestMethod() === 'GET') {
+                return $files->search($this->requestQuery('q'));
+            } else {
+                return $files->query($this->requestBody());
+            }
+        }
+    ],
 ];

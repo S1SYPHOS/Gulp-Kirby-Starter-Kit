@@ -10,13 +10,12 @@ use Throwable;
  *
  * @package   Kirby Toolkit
  * @author    Bastian Allgeier <bastian@getkirby.com>
- * @link      http://getkirby.com
- * @copyright Bastian Allgeier
- * @license   MIT
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://opensource.org/licenses/MIT
  */
 class View
 {
-
     /**
      * The absolute path to the view file
      *
@@ -35,7 +34,7 @@ class View
      * Creates a new view object
      *
      * @param string $file
-     * @param array  $data
+     * @param array $data
      */
     public function __construct(string $file, array $data = [])
     {
@@ -57,11 +56,11 @@ class View
     /**
      * Checks if the template file exists
      *
-     * @return boolean
+     * @return bool
      */
     public function exists(): bool
     {
-        return file_exists($this->file()) === true;
+        return is_file($this->file()) === true;
     }
 
     /**
@@ -95,13 +94,11 @@ class View
             throw new Exception($this->missingViewMessage());
         }
 
-        $exception = null;
-
         ob_start();
-        extract($this->data());
 
+        $exception = null;
         try {
-            require $this->file();
+            F::load($this->file(), null, $this->data());
         } catch (Throwable $e) {
             $exception = $e;
         }
