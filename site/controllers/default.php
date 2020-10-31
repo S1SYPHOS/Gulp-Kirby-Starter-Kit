@@ -13,5 +13,5 @@ See https://getkirby.com/docs/guide/templates/controllers
 
 return function($kirby, $site, $pages, $page) {
 
-  return [];
+    return [];
 };
