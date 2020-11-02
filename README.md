@@ -17,7 +17,7 @@ This boilerplate provides a solid starting point that you can build upon:
 Workflow:
 - Sass / node-sass / libsass
 - Webpack
-- CSS / JS minification
+- HTML / CSS / JS minification
 - Image optimization
 - SVG icon sprites
 - Favicon generation
@@ -37,6 +37,7 @@ Workflow:
 In order to keep everything neat, each task resides in [its own file](https://gulpjs.com/docs/en/getting-started/javascript-and-gulpfiles#splitting-a-gulpfile) under `tasks/`.
 
 Pre-installed Kirby plugins:
+- [Minify HTML](https://github.com/afbora/kirby-minify-html) by @afbora
 - [Fingerprint](https://github.com/bnomei/kirby3-fingerprint) by @bnomei
 
 ## Getting started
@@ -136,7 +137,6 @@ After generating favicons, insert this in your `<head>`:
 <!-- Favicons -->
 <link rel="shortcut icon" href="<?= url('favicon.ico') ?>">
 <?php snippet('favicons') ?>
-
 ```
 
 ### Self-hosting fonts
