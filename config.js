@@ -3,7 +3,7 @@ const
   dist = 'assets/',
   pkg = require('./package.json'),
 
-  localURL = '127.0.0.1:8000',
+  localURL = 'http://localhost:4000',
   faviconSnippet = 'favicon.html',
 
   pngquant = require('imagemin-pngquant')
@@ -19,6 +19,7 @@ module.exports = {
   },
   dist: {
     styles: dist + 'styles',
+    critical: dist + 'styles/critical',
     scripts: dist + 'scripts',
     images: dist + 'images',
     icons: dist + 'images',
@@ -41,6 +42,18 @@ module.exports = {
     },
     prefix: {
       // For more options, see https://github.com/postcss/autoprefixer#options
+    },
+    critical: {
+      enable: false,
+      base: localURL,
+      urls: [
+        // '/some-url',
+        // '/another-url',
+      ],
+      penthouse: {
+        // The CSS file containg styles being scanned by critical CSS library `penthouse`
+        css: dist + 'styles/main.css',
+      },
     },
   },
   scripts: {
