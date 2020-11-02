@@ -3,14 +3,18 @@
 namespace Kirby\Toolkit;
 
 use Closure;
-use Exception;
 
 /**
  * Localization class, roughly inspired by VueI18n
+ *
+ * @package   Kirby Toolkit
+ * @author    Bastian Allgeier <bastian@getkirby.com>
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://opensource.org/licenses/MIT
  */
 class I18n
 {
-
     /**
      * Custom loader function
      *
@@ -62,7 +66,7 @@ class I18n
      * depending on the given number
      *
      * @param int $count
-     * @param boolean $none If true, 'none' will be returned if the count is 0
+     * @param bool $none If true, 'none' will be returned if the count is 0
      * @return string
      */
     public static function form(int $count, bool $none = false): string
@@ -110,7 +114,7 @@ class I18n
                 return $key[$locale];
             }
             if (is_array($fallback)) {
-                return $fallback[$locale] ?? null;
+                return $fallback[$locale] ?? $fallback['en'] ?? reset($fallback);
             }
             return $fallback;
         }
@@ -186,10 +190,18 @@ class I18n
     }
 
     /**
-     * Translate amounts
+     * Translates amounts
+     *
+     * Translation definition options:
+     * - Translation is a simple string: `{{ count }}` gets replaced in the template
+     * - Translation is an array with a value for each count: Chooses the correct template and
+     *   replaces `{{ count }}` in the template; if no specific template for the input count is
+     *   defined, the template that is defined last in the translation array is used
+     * - Translation is a callback with a `$count` argument: Returns the callback return value
      *
      * @param string $key
-     * @param integer $count
+     * @param int $count
+     * @param string $locale
      * @return mixed
      */
     public static function translateCount(string $key, int $count, string $locale = null)
@@ -200,23 +212,18 @@ class I18n
             return null;
         }
 
+        if (is_a($translation, 'Closure') === true) {
+            return $translation($count);
+        }
+
         if (is_string($translation) === true) {
-            return $translation;
-        }
-
-        if (count($translation) !== 3) {
-            throw new Exception('Please provide 3 translations');
-        }
-
-        switch ($count) {
-            case 0:
-                $message = $translation[0];
-                break;
-            case 1:
-                $message = $translation[1];
-                break;
-            default:
-                $message = $translation[2];
+            $message = $translation;
+        } else {
+            if (isset($translation[$count]) === true) {
+                $message = $translation[$count];
+            } else {
+                $message = end($translation);
+            }
         }
 
         return str_replace('{{ count }}', $count, $message);

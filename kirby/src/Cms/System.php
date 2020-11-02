@@ -2,16 +2,19 @@
 
 namespace Kirby\Cms;
 
-use Throwable;
 use Kirby\Data\Json;
 use Kirby\Exception\Exception;
+use Kirby\Exception\InvalidArgumentException;
 use Kirby\Exception\PermissionException;
 use Kirby\Http\Remote;
 use Kirby\Http\Uri;
 use Kirby\Http\Url;
+use Kirby\Toolkit\A;
 use Kirby\Toolkit\Dir;
 use Kirby\Toolkit\F;
 use Kirby\Toolkit\Str;
+use Kirby\Toolkit\V;
+use Throwable;
 
 /**
  * The System class gathers all information
@@ -20,17 +23,22 @@ use Kirby\Toolkit\Str;
  *
  * This is mostly used by the panel installer
  * to check if the panel can be installed at all.
+ *
+ * @package   Kirby Cms
+ * @author    Bastian Allgeier <bastian@getkirby.com>
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://getkirby.com/license
  */
 class System
 {
-
     /**
-     * @var App
+     * @var \Kirby\Cms\App
      */
     protected $app;
 
     /**
-     * @param App $app
+     * @param \Kirby\Cms\App $app
      */
     public function __construct(App $app)
     {
@@ -41,11 +49,11 @@ class System
     }
 
     /**
-     * Improved var_dump output
+     * Improved `var_dump` output
      *
      * @return array
      */
-    public function __debuginfo(): array
+    public function __debugInfo(): array
     {
         return $this->toArray();
     }
@@ -72,7 +80,7 @@ class System
     /**
      * Check for a writable accounts folder
      *
-     * @return boolean
+     * @return bool
      */
     public function accounts(): bool
     {
@@ -82,7 +90,7 @@ class System
     /**
      * Check for a writable content folder
      *
-     * @return boolean
+     * @return bool
      */
     public function content(): bool
     {
@@ -92,7 +100,7 @@ class System
     /**
      * Check for an existing curl extension
      *
-     * @return boolean
+     * @return bool
      */
     public function curl(): bool
     {
@@ -100,107 +108,12 @@ class System
     }
 
     /**
-     * Create the most important folders
-     * if they don't exist yet
-     *
-     * @return void
-     */
-    public function init()
-    {
-        /* /site/accounts */
-        try {
-            Dir::make($this->app->root('accounts'));
-        } catch (Throwable $e) {
-            throw new PermissionException('The accounts directory could not be created');
-        }
-
-        /* /content */
-        try {
-            Dir::make($this->app->root('content'));
-        } catch (Throwable $e) {
-            throw new PermissionException('The content directory could not be created');
-        }
-
-        try {
-            Dir::make($this->app->root('media'));
-        } catch (Throwable $e) {
-            throw new PermissionException('The media directory could not be created');
-        }
-    }
-
-    /**
-     * Check if the panel is installable.
-     * On a public server the panel.install
-     * option must be explicitly set to true
-     * to get the installer up and running.
-     *
-     * @return boolean
-     */
-    public function isInstallable(): bool
-    {
-        return $this->isLocal() === true || $this->app->option('panel.install', false) === true;
-    }
-
-    /**
-     * Check if Kirby is already installed
-     *
-     * @return boolean
-     */
-    public function isInstalled(): bool
-    {
-        return $this->app->users()->count() > 0;
-    }
-
-    /**
-     * Check if this is a local installation
-     *
-     * @return boolean
-     */
-    public function isLocal(): bool
-    {
-        $server = $this->app->server();
-        $host   = $server->host();
-
-        if ($host === 'localhost') {
-            return true;
-        }
-
-        if (in_array($server->address(), ['::1', '127.0.0.1', '0.0.0.0']) === true) {
-            return true;
-        }
-
-        if (Str::endsWith($host, '.dev') === true) {
-            return true;
-        }
-
-        if (Str::endsWith($host, '.local') === true) {
-            return true;
-        }
-
-        if (Str::endsWith($host, '.test') === true) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Check if all tests pass
-     *
-     * @return boolean
-     */
-    public function isOk(): bool
-    {
-        return in_array(false, array_values($this->status()), true) === false;
-    }
-
-    /**
-     * Returns the app's index URL for
-     * licensing purposes without scheme
+     * Returns the app's human-readable
+     * index URL without scheme
      *
      * @return string
      */
-    protected function licenseUrl(): string
+    public function indexUrl(): string
     {
         $url = $this->app->url('index');
 
@@ -218,16 +131,127 @@ class System
     }
 
     /**
+     * Create the most important folders
+     * if they don't exist yet
+     *
+     * @return void
+     * @throws \Kirby\Exception\PermissionException
+     */
+    public function init()
+    {
+        // init /site/accounts
+        try {
+            Dir::make($this->app->root('accounts'));
+        } catch (Throwable $e) {
+            throw new PermissionException('The accounts directory could not be created');
+        }
+
+        // init /content
+        try {
+            Dir::make($this->app->root('content'));
+        } catch (Throwable $e) {
+            throw new PermissionException('The content directory could not be created');
+        }
+
+        // init /media
+        try {
+            Dir::make($this->app->root('media'));
+        } catch (Throwable $e) {
+            throw new PermissionException('The media directory could not be created');
+        }
+    }
+
+    /**
+     * Check if the panel is installable.
+     * On a public server the panel.install
+     * option must be explicitly set to true
+     * to get the installer up and running.
+     *
+     * @return bool
+     */
+    public function isInstallable(): bool
+    {
+        return $this->isLocal() === true || $this->app->option('panel.install', false) === true;
+    }
+
+    /**
+     * Check if Kirby is already installed
+     *
+     * @return bool
+     */
+    public function isInstalled(): bool
+    {
+        return $this->app->users()->count() > 0;
+    }
+
+    /**
+     * Check if this is a local installation
+     *
+     * @return bool
+     */
+    public function isLocal(): bool
+    {
+        $server  = $this->app->server();
+        $visitor = $this->app->visitor();
+        $host    = $server->host();
+
+        if ($host === 'localhost') {
+            return true;
+        }
+
+        if (Str::endsWith($host, '.local') === true) {
+            return true;
+        }
+
+        if (Str::endsWith($host, '.test') === true) {
+            return true;
+        }
+
+        if (in_array($visitor->ip(), ['::1', '127.0.0.1']) === true) {
+            // ensure that there is no reverse proxy in between
+
+            if (
+                isset($_SERVER['HTTP_X_FORWARDED_FOR']) === true &&
+                in_array($_SERVER['HTTP_X_FORWARDED_FOR'], ['::1', '127.0.0.1']) === false
+            ) {
+                return false;
+            }
+
+            if (
+                isset($_SERVER['HTTP_CLIENT_IP']) === true &&
+                in_array($_SERVER['HTTP_CLIENT_IP'], ['::1', '127.0.0.1']) === false
+            ) {
+                return false;
+            }
+
+            // no reverse proxy or the real client also comes from localhost
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if all tests pass
+     *
+     * @return bool
+     */
+    public function isOk(): bool
+    {
+        return in_array(false, array_values($this->status()), true) === false;
+    }
+
+    /**
      * Normalizes the app's index URL for
      * licensing purposes
      *
      * @param string|null $url Input URL, by default the app's index URL
      * @return string Normalized URL
      */
-    protected function licenseUrlNormalized(string $url = null): string
+    protected function licenseUrl(string $url = null): string
     {
         if ($url === null) {
-            $url = $this->licenseUrl();
+            $url = $this->indexUrl();
         }
 
         // remove common "testing" subdomains as well as www.
@@ -259,7 +283,9 @@ class System
      * Loads the license file and returns
      * the license information if available
      *
-     * @return string|false
+     * @return string|bool License key or `false` if the current user has
+     *                     permissions for access.settings, otherwise just a
+     *                     boolean that tells whether a valid license is active
      */
     public function license()
     {
@@ -300,17 +326,24 @@ class System
         }
 
         // verify the URL
-        if ($this->licenseUrlNormalized() !== $this->licenseUrlNormalized($license['domain'])) {
+        if ($this->licenseUrl() !== $this->licenseUrl($license['domain'])) {
             return false;
         }
 
-        return $license['license'];
+        // only return the actual license key if the
+        // current user has appropriate permissions
+        $user = $this->app->user();
+        if ($user && $user->role()->permissions()->for('access', 'settings') === true) {
+            return $license['license'];
+        } else {
+            return true;
+        }
     }
 
     /**
      * Check for an existing mbstring extension
      *
-     * @return boolean
+     * @return bool
      */
     public function mbString(): bool
     {
@@ -320,7 +353,7 @@ class System
     /**
      * Check for a writable media folder
      *
-     * @return boolean
+     * @return bool
      */
     public function media(): bool
     {
@@ -330,7 +363,7 @@ class System
     /**
      * Check for a valid PHP version
      *
-     * @return boolean
+     * @return bool
      */
     public function php(): bool
     {
@@ -342,17 +375,31 @@ class System
      * and adds it to the .license file in the config
      * folder if possible.
      *
-     * @param string $license
-     * @param string $email
-     * @return boolean
+     * @param string|null $license
+     * @param string|null $email
+     * @return bool
+     * @throws \Kirby\Exception\Exception
+     * @throws \Kirby\Exception\InvalidArgumentException
      */
-    public function register(string $license, string $email): bool
+    public function register(string $license = null, string $email = null): bool
     {
+        if (Str::startsWith($license, 'K3-PRO-') === false) {
+            throw new InvalidArgumentException([
+                'key' => 'license.format'
+            ]);
+        }
+
+        if (V::email($email) === false) {
+            throw new InvalidArgumentException([
+                'key' => 'license.email'
+            ]);
+        }
+
         $response = Remote::get('https://licenses.getkirby.com/register', [
             'data' => [
                 'license' => $license,
                 'email'   => $email,
-                'domain'  => $this->licenseUrl()
+                'domain'  => $this->indexUrl()
             ]
         ]);
 
@@ -373,7 +420,9 @@ class System
         Json::write($file, $json);
 
         if ($this->license() === false) {
-            throw new Exception('The license could not be verified');
+            throw new InvalidArgumentException([
+                'key' => 'license.verification'
+            ]);
         }
 
         return true;
@@ -382,17 +431,21 @@ class System
     /**
      * Check for a valid server environment
      *
-     * @return boolean
+     * @return bool
      */
     public function server(): bool
     {
-        $servers = [
-            'apache',
-            'caddy',
-            'litespeed',
-            'nginx',
-            'php'
-        ];
+        if ($servers = $this->app->option('servers')) {
+            $servers = A::wrap($servers);
+        } else {
+            $servers = [
+                'apache',
+                'caddy',
+                'litespeed',
+                'nginx',
+                'php'
+            ];
+        }
 
         $software = $_SERVER['SERVER_SOFTWARE'] ?? null;
 
@@ -402,7 +455,7 @@ class System
     /**
      * Check for a writable sessions folder
      *
-     * @return boolean
+     * @return bool
      */
     public function sessions(): bool
     {

@@ -2,16 +2,18 @@
 
 namespace Kirby\Cms;
 
-use Exception;
-use Kirby\Data\Data;
-use Kirby\Exception\PermissionException;
-use Kirby\Toolkit\F;
 use Kirby\Toolkit\Properties;
 
 /**
  * Each page, file or site can have multiple
  * translated versions of their content,
  * represented by this class
+ *
+ * @package   Kirby Cms
+ * @author    Bastian Allgeier <bastian@getkirby.com>
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://getkirby.com/license
  */
 class ContentTranslation
 {
@@ -33,7 +35,7 @@ class ContentTranslation
     protected $contentFile;
 
     /**
-     * @var Page|Site|File
+     * @var Model
      */
     protected $parent;
 
@@ -54,11 +56,11 @@ class ContentTranslation
     }
 
     /**
-     * Improve var_dump() output
+     * Improve `var_dump` output
      *
      * @return array
      */
-    public function __debuginfo(): array
+    public function __debugInfo(): array
     {
         return $this->toArray();
     }
@@ -82,8 +84,13 @@ class ContentTranslation
      */
     public function content(): array
     {
-        $parent  = $this->parent();
-        $content = $this->content ?? $parent->readContent($this->code());
+        $parent = $this->parent();
+
+        if ($this->content === null) {
+            $this->content = $parent->readContent($this->code());
+        }
+
+        $content = $this->content;
 
         // merge with the default content
         if ($this->isDefault() === false && $defaultLanguage = $parent->kirby()->defaultLanguage()) {
@@ -112,7 +119,7 @@ class ContentTranslation
     /**
      * Checks if the translation file exists
      *
-     * @return boolean
+     * @return bool
      */
     public function exists(): bool
     {
@@ -122,9 +129,9 @@ class ContentTranslation
     /**
      * Returns the translation code as id
      *
-     * @return void
+     * @return string
      */
-    public function id()
+    public function id(): string
     {
         return $this->code();
     }
@@ -133,7 +140,7 @@ class ContentTranslation
      * Checks if the this is the default translation
      * of the model
      *
-     * @return boolean
+     * @return bool
      */
     public function isDefault(): bool
     {
@@ -145,9 +152,9 @@ class ContentTranslation
     }
 
     /**
-     * Returns the parent Page, File or Site object
+     * Returns the parent page, file or site object
      *
-     * @return Page|File|Site
+     * @return \Kirby\Cms\Model
      */
     public function parent()
     {
@@ -158,37 +165,37 @@ class ContentTranslation
      * @param string $code
      * @return self
      */
-    protected function setCode(string $code): self
+    protected function setCode(string $code)
     {
         $this->code = $code;
         return $this;
     }
 
     /**
-     * @param array $content
+     * @param array|null $content
      * @return self
      */
-    protected function setContent(array $content = null): self
+    protected function setContent(array $content = null)
     {
         $this->content = $content;
         return $this;
     }
 
     /**
-     * @param Model $parent
+     * @param \Kirby\Cms\Model $parent
      * @return self
      */
-    protected function setParent(Model $parent): self
+    protected function setParent(Model $parent)
     {
         $this->parent = $parent;
         return $this;
     }
 
     /**
-     * @param string $slug
+     * @param string|null $slug
      * @return self
      */
-    protected function setSlug(string $slug = null): self
+    protected function setSlug(string $slug = null)
     {
         $this->slug = $slug;
         return $this;
@@ -218,7 +225,7 @@ class ContentTranslation
     }
 
     /**
-     * Converts the most imporant translation
+     * Converts the most important translation
      * props to an array
      *
      * @return array

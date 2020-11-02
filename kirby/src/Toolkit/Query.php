@@ -2,6 +2,9 @@
 
 namespace Kirby\Toolkit;
 
+use Kirby\Exception\BadMethodCallException;
+use Kirby\Exception\InvalidArgumentException;
+
 /**
  * The Query class can be used to
  * query arrays and objects, including their
@@ -9,11 +12,21 @@ namespace Kirby\Toolkit;
  *
  * @package   Kirby Toolkit
  * @author    Bastian Allgeier <bastian@getkirby.com>
- * @link      http://getkirby.com
- * @copyright Bastian Allgeier
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://opensource.org/licenses/MIT
  */
 class Query
 {
+    const PARTS      = '!\.|(\(([^()]+|(?1))*+\))(*SKIP)(*FAIL)!'; // split by dot, but not inside (nested) parens
+    const PARAMETERS = '!,|' . self::SKIP . '!'; // split by comma, but not inside skip groups
+
+    const NO_PNTH = '\([^(]+\)(*SKIP)(*FAIL)';
+    const NO_SQBR = '\[[^]]+\](*SKIP)(*FAIL)';
+    const NO_DLQU = '\"(?:[^"\\\\]|\\\\.)*\"(*SKIP)(*FAIL)';  // allow \" escaping inside string
+    const NO_SLQU = '\'(?:[^\'\\\\]|\\\\.)*\'(*SKIP)(*FAIL)'; // allow \' escaping inside string
+    const SKIP    = self::NO_PNTH . '|' . self::NO_SQBR . '|' .
+                    self::NO_DLQU . '|' . self::NO_SLQU;
 
     /**
      * The query string
@@ -32,10 +45,10 @@ class Query
     /**
      * Creates a new Query object
      *
-     * @param string $query
-     * @param array  $data
+     * @param string|null $query
+     * @param array|object $data
      */
-    public function __construct(string $query = null, $data = [])
+    public function __construct(?string $query = null, $data = [])
     {
         $this->query = $query;
         $this->data  = $data;
@@ -43,7 +56,7 @@ class Query
 
     /**
      * Returns the query result if anything
-     * can be found. Otherwise returns null.
+     * can be found, otherwise returns null
      *
      * @return mixed
      */
@@ -53,31 +66,70 @@ class Query
             return $this->data;
         }
 
-        $parts = $this->parts($this->query);
+        return $this->resolve($this->query);
+    }
+
+    /**
+     * Resolves the query if anything
+     * can be found, otherwise returns null
+     *
+     * @param string $query
+     * @return mixed
+     *
+     * @throws Kirby\Exception\BadMethodCallException If an invalid method is accessed by the query
+     */
+    protected function resolve(string $query)
+    {
+        // direct key access in arrays
+        if (is_array($this->data) === true && array_key_exists($query, $this->data) === true) {
+            return $this->data[$query];
+        }
+
+        $parts = $this->parts($query);
         $data  = $this->data;
         $value = null;
 
-        while (count($parts)) {
-            $part   = array_shift($parts);
-            $info   = $this->info($part);
+        foreach ($parts as $part) {
+            $info   = $this->part($part);
             $method = $info['method'];
-            $value  = null;
+            $args   = $info['args'];
 
             if (is_array($data)) {
-                $value = $data[$method] ?? null;
-            } elseif (is_object($data)) {
-                if (method_exists($data, $method) || method_exists($data, '__call')) {
-                    $value = $data->$method(...$info['args']);
+                if (array_key_exists($method, $data) === true) {
+                    $value = $data[$method];
+
+                    if (is_a($value, 'Closure') === true) {
+                        $value = $value(...$args);
+                    } elseif ($args !== []) {
+                        throw new InvalidArgumentException('Cannot access array element ' . $method . ' with arguments');
+                    }
+                } else {
+                    static::accessError($data, $method, 'property');
                 }
-            } elseif (is_scalar($data)) {
-                return $data;
+            } elseif (is_object($data)) {
+                if (
+                    method_exists($data, $method) === true ||
+                    method_exists($data, '__call') === true
+                ) {
+                    $value = $data->$method(...$args);
+                } elseif (
+                    $args === [] && (
+                        property_exists($data, $method) === true ||
+                        method_exists($data, '__get') === true
+                    )
+                ) {
+                    $value = $data->$method;
+                } else {
+                    $label = ($args === []) ? 'method/property' : 'method';
+                    static::accessError($data, $method, $label);
+                }
             } else {
-                return null;
+                // further parts on a scalar/null value
+                static::accessError($data, $method, 'method/property');
             }
 
-            if (is_array($value) || is_object($value)) {
-                $data = $value;
-            }
+            // continue with the current value for the next part
+            $data = $value;
         }
 
         return $value;
@@ -86,64 +138,107 @@ class Query
     /**
      * Breaks the query string down into its components
      *
-     * @param  string $token
+     * @param string $query
      * @return array
      */
-    protected function parts(string $token): array
+    protected function parts(string $query): array
     {
-        $token = trim($token);
-        $token = preg_replace_callback('!\((.*?)\)!', function ($match) {
-            return '(' . str_replace('.', '@@@', $match[1]) . ')';
-        }, $token);
-
-        $parts = explode('.', $token);
-
-        return $parts;
+        return preg_split(self::PARTS, trim($query), -1, PREG_SPLIT_NO_EMPTY);
     }
 
     /**
      * Analyzes each part of the query string and
-     * extracts methods and method arguments.
+     * extracts methods and method arguments
      *
-     * @param  string $token
+     * @param string $part
      * @return array
      */
-    protected function info(string $token): array
+    protected function part(string $part): array
     {
-        $args   = [];
-        $method = preg_replace_callback('!\((.*?)\)!', function ($match) use (&$args) {
-            $args = array_map(function ($arg) {
-                $arg = trim($arg);
-                $arg = str_replace('@@@', '.', $arg);
+        if (Str::endsWith($part, ')') === true) {
+            $method = Str::before($part, '(');
 
-                if (substr($arg, 0, 1) === '"') {
-                    return trim($arg, '"');
-                }
+            // the args are everything inside the *outer* parentheses
+            $args = Str::substr($part, Str::position($part, '(') + 1, -1);
+            $args = preg_split(self::PARAMETERS, $args);
+            $args = array_map('self::parameter', $args);
 
-                if (substr($arg, 0, 1) === '\'') {
-                    return trim($arg, '\'');
-                }
+            return compact('method', 'args');
+        } else {
+            return [
+                'method' => $part,
+                'args'   => []
+            ];
+        }
+    }
 
-                switch ($arg) {
-                    case 'null':
-                        return null;
-                    case 'false':
-                        return false;
-                    case 'true':
-                        return true;
-                }
+    /**
+     * Converts a parameter of a query to
+     * its proper native PHP type
+     *
+     * @param string $arg
+     * @return mixed
+     */
+    protected function parameter(string $arg)
+    {
+        $arg = trim($arg);
 
-                if (is_numeric($arg) === true) {
-                    return (float)$arg;
-                }
+        // string with double quotes
+        if (substr($arg, 0, 1) === '"' && substr($arg, -1) === '"') {
+            return str_replace('\"', '"', substr($arg, 1, -1));
+        }
 
-                return $arg;
-            }, str_getcsv($match[1], ','));
-        }, $token);
+        // string with single quotes
+        if (substr($arg, 0, 1) === "'" && substr($arg, -1) === "'") {
+            return str_replace("\'", "'", substr($arg, 1, -1));
+        }
 
-        return [
-            'method' => $method,
-            'args'   => $args
-        ];
+        // boolean or null
+        switch ($arg) {
+            case 'null':
+                return null;
+            case 'false':
+                return false;
+            case 'true':
+                return true;
+        }
+
+        // numeric
+        if (is_numeric($arg) === true) {
+            return (float)$arg;
+        }
+
+        // array: split and recursive sanitizing
+        if (substr($arg, 0, 1) === '[' && substr($arg, -1) === ']') {
+            $arg = substr($arg, 1, -1);
+            $arg = preg_split(self::PARAMETERS, $arg);
+            return array_map('self::parameter', $arg);
+        }
+
+        // resolve parameter for objects and methods itself
+        return $this->resolve($arg);
+    }
+
+    /**
+     * Throws an exception for an access to an invalid method
+     *
+     * @param mixed $data Variable on which the access was tried
+     * @param string $name Name of the method/property that was accessed
+     * @param string $label Type of the name (`method`, `property` or `method/property`)
+     * @return void
+     *
+     * @throws Kirby\Exception\BadMethodCallException
+     */
+    protected static function accessError($data, string $name, string $label): void
+    {
+        $type = strtolower(gettype($data));
+        if ($type === 'double') {
+            $type = 'float';
+        }
+
+        $nonExisting = in_array($type, ['array', 'object']) ? 'non-existing ' : '';
+
+        $error = 'Access to ' . $nonExisting . $label . ' ' . $name . ' on ' . $type;
+        throw new BadMethodCallException($error);
     }
 }

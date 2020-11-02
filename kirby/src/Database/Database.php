@@ -2,20 +2,25 @@
 
 namespace Kirby\Database;
 
+use Closure;
 use Exception;
 use Kirby\Exception\InvalidArgumentException;
 use Kirby\Toolkit\A;
 use Kirby\Toolkit\Str;
 use PDO;
-use PDOStatement;
 use Throwable;
 
 /**
  * A simple database class
+ *
+ * @package   Kirby Database
+ * @author    Bastian Allgeier <bastian@getkirby.com>
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://opensource.org/licenses/MIT
  */
 class Database
 {
-
     /**
      * The number of affected rows for the last query
      *
@@ -33,7 +38,7 @@ class Database
     /**
      * The established connection
      *
-     * @var PDO|null
+     * @var \PDO|null
      */
     protected $connection;
 
@@ -59,7 +64,7 @@ class Database
     /**
      * Set to true to throw exceptions on failed queries
      *
-     * @var boolean
+     * @var bool
      */
     protected $fail = false;
 
@@ -73,7 +78,7 @@ class Database
     /**
      * The last error
      *
-     * @var Exception|null
+     * @var \Exception|null
      */
     protected $lastError;
 
@@ -108,16 +113,16 @@ class Database
     /**
      * The PDO query statement
      *
-     * @var PDOStatement|null
+     * @var \PDOStatement|null
      */
     protected $statement;
 
     /**
-     * Whitelists for table names
+     * List of existing tables in the database
      *
      * @var array|null
      */
-    protected $tableWhitelist;
+    protected $tables;
 
     /**
      * An array with all queries which are being made
@@ -150,12 +155,12 @@ class Database
     }
 
     /**
-     * Returns one of the started instance
+     * Returns one of the started instances
      *
-     * @param string $id
-     * @return Database
+     * @param string|null $id
+     * @return self|null
      */
-    public static function instance(string $id = null): self
+    public static function instance(string $id = null)
     {
         return $id === null ? A::last(static::$connections) : static::$connections[$id] ?? null;
     }
@@ -174,7 +179,8 @@ class Database
      * Connects to a database
      *
      * @param array|null $params This can either be a config key or an array of parameters for the connection
-     * @return Database
+     * @return \PDO|null
+     * @throws \Kirby\Exception\InvalidArgumentException
      */
     public function connect(array $params = null)
     {
@@ -217,18 +223,18 @@ class Database
     /**
      * Returns the currently active connection
      *
-     * @return Database|null
+     * @return \PDO|null
      */
-    public function connection()
+    public function connection(): ?PDO
     {
         return $this->connection;
     }
 
     /**
-     * Sets the exception mode for the next query
+     * Sets the exception mode
      *
-     * @param boolean $fail
-     * @return Database
+     * @param bool $fail
+     * @return \Kirby\Database\Database
      */
     public function fail(bool $fail = true)
     {
@@ -271,10 +277,10 @@ class Database
     /**
      * Adds a value to the db trace and also returns the entire trace if nothing is specified
      *
-     * @param array $data
+     * @param array|null $data
      * @return array
      */
-    public function trace($data = null): array
+    public function trace(array $data = null): array
     {
         // return the full trace
         if ($data === null) {
@@ -330,7 +336,7 @@ class Database
     /**
      * Returns the last db error
      *
-     * @return Throwable
+     * @return \Throwable
      */
     public function lastError()
     {
@@ -353,18 +359,17 @@ class Database
      *
      * @param string $query
      * @param array $bindings
-     * @return boolean
+     * @return bool
      */
     protected function hit(string $query, array $bindings = []): bool
     {
-
         // try to prepare and execute the sql
         try {
             $this->statement = $this->connection->prepare($query);
             $this->statement->execute($bindings);
 
             $this->affected  = $this->statement->rowCount();
-            $this->lastId    = $this->connection->lastInsertId();
+            $this->lastId    = Str::startsWith($query, 'insert ', true) ? $this->connection->lastInsertId() : null;
             $this->lastError = null;
 
             // store the final sql to add it to the trace later
@@ -390,15 +395,12 @@ class Database
             'error'    => $this->lastError
         ]);
 
-        // reset some stuff
-        $this->fail = false;
-
         // return true or false on success or failure
         return $this->lastError === null;
     }
 
     /**
-     * Exectues a sql query, which is expected to return a set of results
+     * Executes a sql query, which is expected to return a set of results
      *
      * @param string $query
      * @param array $bindings
@@ -421,7 +423,11 @@ class Database
         }
 
         // define the default flag for the fetch method
-        $flags = $options['fetch'] === 'array' ? PDO::FETCH_ASSOC : PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE;
+        if ($options['fetch'] instanceof Closure || $options['fetch'] === 'array') {
+            $flags = PDO::FETCH_ASSOC;
+        } else {
+            $flags = PDO::FETCH_CLASS|PDO::FETCH_PROPS_LATE;
+        }
 
         // add optional flags
         if (empty($options['flag']) === false) {
@@ -429,7 +435,7 @@ class Database
         }
 
         // set the fetch mode
-        if ($options['fetch'] === 'array') {
+        if ($options['fetch'] instanceof Closure || $options['fetch'] === 'array') {
             $this->statement->setFetchMode($flags);
         } else {
             $this->statement->setFetchMode($flags, $options['fetch']);
@@ -437,6 +443,13 @@ class Database
 
         // fetch that stuff
         $results = $this->statement->{$options['method']}();
+
+        // apply the fetch closure to all results if given
+        if ($options['fetch'] instanceof Closure) {
+            foreach ($results as $key => $result) {
+                $results[$key] = $options['fetch']($result, $key);
+            }
+        }
 
         if ($options['iterator'] === 'array') {
             return $this->lastResult = $results;
@@ -450,7 +463,7 @@ class Database
      *
      * @param string $query
      * @param array $bindings
-     * @return boolean
+     * @return bool
      */
     public function execute(string $query, array $bindings = []): bool
     {
@@ -461,7 +474,7 @@ class Database
      * Returns the correct Sql generator instance
      * for the type of database
      *
-     * @return Sql
+     * @return \Kirby\Database\Sql
      */
     public function sql()
     {
@@ -470,10 +483,12 @@ class Database
     }
 
     /**
-     * Sets the current table, which should be queried
+     * Sets the current table, which should be queried. Returns a
+     * Query object, which can be used to build a full query
+     * for that table
      *
      * @param string $table
-     * @return Query Returns a Query object, which can be used to build a full query for that table
+     * @return \Kirby\Database\Query
      */
     public function table(string $table)
     {
@@ -484,23 +499,23 @@ class Database
      * Checks if a table exists in the current database
      *
      * @param string $table
-     * @return boolean
+     * @return bool
      */
     public function validateTable(string $table): bool
     {
-        if ($this->tableWhitelist === null) {
-            // Get the table whitelist from the database
+        if ($this->tables === null) {
+            // Get the list of tables from the database
             $sql     = $this->sql()->tables($this->database);
             $results = $this->query($sql['query'], $sql['bindings']);
 
             if ($results) {
-                $this->tableWhitelist = $results->pluck('name');
+                $this->tables = $results->pluck('name');
             } else {
                 return false;
             }
         }
 
-        return in_array($table, $this->tableWhitelist) === true;
+        return in_array($table, $this->tables) === true;
     }
 
     /**
@@ -508,7 +523,7 @@ class Database
      *
      * @param string $table
      * @param string $column
-     * @return boolean
+     * @return bool
      */
     public function validateColumn(string $table, string $column): bool
     {
@@ -537,7 +552,7 @@ class Database
      *
      * @param string $table
      * @param array $columns
-     * @return boolean
+     * @return bool
      */
     public function createTable($table, $columns = []): bool
     {
@@ -552,6 +567,11 @@ class Database
             }
         }
 
+        // update cache
+        if (in_array($table, $this->tables ?? []) !== true) {
+            $this->tables[] = $table;
+        }
+
         return true;
     }
 
@@ -559,18 +579,32 @@ class Database
      * Drops a table
      *
      * @param string $table
-     * @return boolean
+     * @return bool
      */
-    public function dropTable($table): bool
+    public function dropTable(string $table): bool
     {
         $sql = $this->sql()->dropTable($table);
-        return $this->execute($sql['query'], $sql['bindings']);
+        if ($this->execute($sql['query'], $sql['bindings']) !== true) {
+            return false;
+        }
+
+        // update cache
+        $key = array_search($table, $this->tables ?? []);
+        if ($key !== false) {
+            unset($this->tables[$key]);
+        }
+
+        return true;
     }
 
     /**
      * Magic way to start queries for tables by
      * using a method named like the table.
      * I.e. $db->users()->all()
+     *
+     * @param mixed $method
+     * @param mixed $arguments
+     * @return \Kirby\Database\Query
      */
     public function __call($method, $arguments = null)
     {

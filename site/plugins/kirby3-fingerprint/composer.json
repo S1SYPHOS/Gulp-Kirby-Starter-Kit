@@ -1,35 +1,66 @@
 {
-    "name": "bnomei/kirby3-fingerprint",
-    "type": "kirby-plugin",
-    "version": "2.3.1",
-    "description": "File Method and css/js helper to add cachbusting hash and optional Subresource Integrity to file",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Bruno Meilick",
-            "email": "b@bnomei.com"
-        }
-    ],
-    "keywords": [
-        "kirby3",
-        "kirby3-cms",
-        "kirby3-plugin",
-        "fingerprint",
-        "hash",
-        "cache-buster",
-        "subresource-integrity"
-    ],
-    "autoload": {
-        "psr-4": {
-            "Bnomei\\": "classes/"
-        }
-    },
-    "config": {
-        "optimize-autoloader": true,
-        "sort-packages": true
-    },
-    "require": {
-        "php": ">=7.1.0",
-        "getkirby/composer-installer": "^1.1"
+  "name": "bnomei/kirby3-fingerprint",
+  "type": "kirby-plugin",
+  "version": "3.0.9",
+  "description": "File Method and css/js helper to add cachebusting hash and optional Subresource Integrity to file",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Bruno Meilick",
+      "email": "b@bnomei.com"
     }
+  ],
+  "keywords": [
+    "kirby3",
+    "kirby3-cms",
+    "kirby3-plugin",
+    "fingerprint",
+    "hash",
+    "cache-buster",
+    "subresource-integrity",
+    "manifest",
+    "manifest-file",
+    "json",
+    "assets"
+  ],
+  "autoload": {
+    "psr-4": {
+      "Bnomei\\": "classes/"
+    }
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true
+  },
+  "require": {
+    "php": ">=7.2.0",
+    "getkirby/composer-installer": "^1.1"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^8.3",
+    "getkirby/cms": "^3.2",
+    "php-coveralls/php-coveralls": "^2.1",
+    "nunomaduro/phpinsights": "^1.8"
+  },
+  "scripts": {
+    "analyze": "phpstan analyse classes",
+    "insights": "./vendor/bin/phpinsights -v",
+    "fix": "php-cs-fixer fix",
+    "test": [
+      "mkdir -p tests/logs",
+      "phpunit --configuration ./phpunit.xml"
+    ],
+    "dist": [
+      "composer install --no-dev --optimize-autoloader",
+      "git rm -rf --cached .; git add .;"
+    ]
+  },
+  "extra": {
+    "kirby-cms-path": "tests/kirby"
+  },
+  "suggest": {
+    "bnomei/kirby3-autoid": "Get modification timestamp for kirby files (not css/js) at almost zero-cpu-cost",
+    "bnomei/kirby3-security-headers": "Let's make the web a saver place – sensible defaults included.",
+    "diverently/laravel-mix-kirby": "Consider using this plugin instead if all your assets are versioned by laravel mix."
+  }
 }

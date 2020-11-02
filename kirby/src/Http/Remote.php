@@ -3,6 +3,8 @@
 namespace Kirby\Http;
 
 use Exception;
+use Kirby\Cms\App;
+use Kirby\Exception\InvalidArgumentException;
 use Kirby\Toolkit\F;
 use Kirby\Toolkit\Str;
 
@@ -12,27 +14,31 @@ use Kirby\Toolkit\Str;
  *
  * @package   Kirby Http
  * @author    Bastian Allgeier <bastian@getkirby.com>
- * @link      http://getkirby.com
- * @copyright Bastian Allgeier
- * @license   http://www.opensource.org/licenses/mit-license.php MIT License
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://opensource.org/licenses/MIT
  */
 class Remote
 {
+    const CA_INTERNAL = 1;
+    const CA_SYSTEM   = 2;
 
     /**
      * @var array
      */
     public static $defaults = [
-        'agent'    => null,
-        'body'     => true,
-        'data'     => [],
-        'encoding' => 'utf-8',
-        'file'     => null,
-        'headers'  => [],
-        'method'   => 'GET',
-        'progress' => null,
-        'test'     => false,
-        'timeout'  => 10,
+        'agent'     => null,
+        'basicAuth' => null,
+        'body'      => true,
+        'ca'        => self::CA_INTERNAL,
+        'data'      => [],
+        'encoding'  => 'utf-8',
+        'file'      => null,
+        'headers'   => [],
+        'method'    => 'GET',
+        'progress'  => null,
+        'test'      => false,
+        'timeout'   => 10,
     ];
 
     /**
@@ -96,8 +102,17 @@ class Remote
      */
     public function __construct(string $url, array $options = [])
     {
+        $defaults = static::$defaults;
+
+        // update the defaults with App config if set;
+        // request the App instance lazily
+        $app = App::instance(null, true);
+        if ($app !== null) {
+            $defaults = array_merge($defaults, $app->option('remote', []));
+        }
+
         // set all options
-        $this->options = array_merge(static::$defaults, $options);
+        $this->options = array_merge($defaults, $options);
 
         // add the url
         $this->options['url'] = $url;
@@ -114,7 +129,7 @@ class Remote
     /**
      * Returns the http status code
      *
-     * @return integer|null
+     * @return int|null
      */
     public function code(): ?int
     {
@@ -138,7 +153,6 @@ class Remote
      */
     public function fetch()
     {
-
         // curl options
         $this->curlopt = [
             CURLOPT_URL              => $this->options['url'],
@@ -149,7 +163,6 @@ class Remote
             CURLOPT_RETURNTRANSFER   => $this->options['body'],
             CURLOPT_FOLLOWLOCATION   => true,
             CURLOPT_MAXREDIRS        => 10,
-            CURLOPT_SSL_VERIFYPEER   => false,
             CURLOPT_HEADER           => false,
             CURLOPT_HEADERFUNCTION   => function ($curl, $header) {
                 $parts = Str::split($header, ':');
@@ -163,6 +176,30 @@ class Remote
             }
         ];
 
+        // determine the TLS CA to use
+        if ($this->options['ca'] === self::CA_INTERNAL) {
+            $this->curlopt[CURLOPT_SSL_VERIFYPEER] = true;
+            $this->curlopt[CURLOPT_CAINFO] = dirname(__DIR__, 2) . '/cacert.pem';
+        } elseif ($this->options['ca'] === self::CA_SYSTEM) {
+            $this->curlopt[CURLOPT_SSL_VERIFYPEER] = true;
+        } elseif ($this->options['ca'] === false) {
+            $this->curlopt[CURLOPT_SSL_VERIFYPEER] = false;
+        } elseif (
+            is_string($this->options['ca']) === true &&
+            is_file($this->options['ca']) === true
+        ) {
+            $this->curlopt[CURLOPT_SSL_VERIFYPEER] = true;
+            $this->curlopt[CURLOPT_CAINFO] = $this->options['ca'];
+        } elseif (
+            is_string($this->options['ca']) === true &&
+            is_dir($this->options['ca']) === true
+        ) {
+            $this->curlopt[CURLOPT_SSL_VERIFYPEER] = true;
+            $this->curlopt[CURLOPT_CAPATH] = $this->options['ca'];
+        } else {
+            throw new InvalidArgumentException('Invalid "ca" option for the Remote class');
+        }
+
         // add the progress
         if (is_callable($this->options['progress']) === true) {
             $this->curlopt[CURLOPT_NOPROGRESS]       = false;
@@ -171,7 +208,22 @@ class Remote
 
         // add all headers
         if (empty($this->options['headers']) === false) {
-            $this->curlopt[CURLOPT_HTTPHEADER] = $this->options['headers'];
+            // convert associative arrays to strings
+            $headers = [];
+            foreach ($this->options['headers'] as $key => $value) {
+                if (is_string($key) === true) {
+                    $headers[] = $key . ': ' . $value;
+                } else {
+                    $headers[] = $value;
+                }
+            }
+
+            $this->curlopt[CURLOPT_HTTPHEADER] = $headers;
+        }
+
+        // add HTTP Basic authentication
+        if (empty($this->options['basicAuth']) === false) {
+            $this->curlopt[CURLOPT_USERPWD] = $this->options['basicAuth'];
         }
 
         // add the user agent
@@ -180,7 +232,7 @@ class Remote
         }
 
         // do some request specific stuff
-        switch ($action = strtoupper($this->options['method'])) {
+        switch (strtoupper($this->options['method'])) {
             case 'POST':
                 $this->curlopt[CURLOPT_POST]          = true;
                 $this->curlopt[CURLOPT_CUSTOMREQUEST] = 'POST';
@@ -285,7 +337,7 @@ class Remote
      * Decode the response content
      *
      * @param bool $array decode as array or object
-     * @return array|stdClass
+     * @return array|\stdClass
      */
     public function json(bool $array = true)
     {

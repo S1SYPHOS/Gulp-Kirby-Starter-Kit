@@ -1,8 +1,8 @@
 <?php
 
 return [
-  'environment' => 'production',
+    'environment' => 'production',
 
-  # Deactivating debug mode
-  'debug' => false,
+    # Deactivating debug mode
+    'debug' => false,
 ];

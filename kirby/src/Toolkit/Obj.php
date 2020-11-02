@@ -7,10 +7,15 @@ use stdClass;
 /**
  * Super simple stdClass extension with
  * magic getter methods for all properties
+ *
+ * @package   Kirby Toolkit
+ * @author    Bastian Allgeier <bastian@getkirby.com>
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://opensource.org/licenses/MIT
  */
 class Obj extends stdClass
 {
-
     /**
      * Constructor
      *
@@ -36,11 +41,11 @@ class Obj extends stdClass
     }
 
     /**
-     * Improved var_dump() output
+     * Improved `var_dump` output
      *
      * @return array
      */
-    public function __debuginfo(): array
+    public function __debugInfo(): array
     {
         return $this->toArray();
     }
@@ -91,6 +96,7 @@ class Obj extends stdClass
     /**
      * Converts the object to a json string
      *
+     * @param mixed ...$arguments
      * @return string
      */
     public function toJson(...$arguments): string

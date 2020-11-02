@@ -1,19 +1,18 @@
 <?php
 
-use Kirby\Cms\Auth;
 use Kirby\Exception\PermissionException;
-use Kirby\Toolkit\Str;
 
 return function () {
-    $auth = $this->kirby()->auth();
+    $auth               = $this->kirby()->auth();
+    $allowImpersonation = $this->kirby()->option('api.allowImpersonation') ?? false;
 
     // csrf token check
-    if ($auth->type() === 'session' && $auth->csrf() === false) {
-        throw new PermissionException('Unauthenticated', 403);
+    if ($auth->type($allowImpersonation) === 'session' && $auth->csrf() === false) {
+        throw new PermissionException('Unauthenticated');
     }
 
     // get user from session or basic auth
-    if ($user = $auth->user()) {
+    if ($user = $auth->user(null, $allowImpersonation)) {
         if ($user->role()->permissions()->for('access', 'panel') === false) {
             throw new PermissionException(['key' => 'access.panel']);
         }
@@ -21,5 +20,5 @@ return function () {
         return $user;
     }
 
-    throw new PermissionException('Unauthenticated', 403);
+    throw new PermissionException('Unauthenticated');
 };

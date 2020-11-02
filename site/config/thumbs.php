@@ -1,12 +1,13 @@
 <?php
 
 return [
-  // Thumbnail options go here
+    // Thumbnail options go here
 
-  // General settings
-  'quality'   => 85,
-  'interlace' => true,
+    // General settings
+    // 'driver'    => 'im',
+    'quality'   => 85,
+    'interlace' => true,
 
-  // Thumbnail presets
-  'presets' => [],
+    // Thumbnail presets
+    'presets' => [],
 ];

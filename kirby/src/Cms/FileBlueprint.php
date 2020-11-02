@@ -5,6 +5,12 @@ namespace Kirby\Cms;
 /**
  * Extension of the basic blueprint class
  * to handle all blueprints for files.
+ *
+ * @package   Kirby Cms
+ * @author    Bastian Allgeier <bastian@getkirby.com>
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://getkirby.com/license
  */
 class FileBlueprint extends Blueprint
 {
@@ -20,6 +26,7 @@ class FileBlueprint extends Blueprint
                 'changeName' => null,
                 'create'     => null,
                 'delete'     => null,
+                'read'       => null,
                 'replace'    => null,
                 'update'     => null,
             ]
@@ -29,12 +36,19 @@ class FileBlueprint extends Blueprint
         $this->props['accept'] = $this->normalizeAccept($this->props['accept'] ?? []);
     }
 
+    /**
+     * @return array
+     */
     public function accept(): array
     {
         return $this->props['accept'];
     }
 
-    protected function normalizeAccept($accept = null)
+    /**
+     * @param mixed $accept
+     * @return array
+     */
+    protected function normalizeAccept($accept = null): array
     {
         if (is_string($accept) === true) {
             $accept = [

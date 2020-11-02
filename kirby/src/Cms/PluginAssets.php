@@ -10,59 +10,22 @@ use Kirby\Toolkit\F;
  * Plugin assets are automatically copied/linked
  * to the media folder, to make them publicly
  * available. This class handles the magic around that.
+ *
+ * @package   Kirby Cms
+ * @author    Bastian Allgeier <bastian@getkirby.com>
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://getkirby.com/license
  */
 class PluginAssets
 {
-
-    /**
-     * Concatenate all plugin js and css files into
-     * a single file and copy them to /media/plugins/index.css or /media/plugins/index.js
-     *
-     * @param string $extension
-     * @return string
-     */
-    public static function index(string $extension): string
-    {
-        $kirby    = App::instance();
-        $cache    = $kirby->root('media') . '/plugins/.index.' . $extension;
-        $build    = false;
-        $modified = [0];
-        $assets   = [];
-
-        foreach ($kirby->plugins() as $plugin) {
-            $file = $plugin->root() . '/index.' . $extension;
-
-            if (file_exists($file) === true) {
-                $assets[]   = $file;
-                $modified[] = F::modified($file);
-            }
-        }
-
-        if (empty($assets)) {
-            return false;
-        }
-
-        if (file_exists($cache) === false || filemtime($cache) < max($modified)) {
-            $dist = [];
-            foreach ($assets as $asset) {
-                $dist[] = file_get_contents($asset);
-            }
-            $dist = implode(PHP_EOL, $dist);
-            F::write($cache, $dist);
-        } else {
-            $dist = file_get_contents($cache);
-        }
-
-        return $dist;
-    }
-
     /**
      * Clean old/deprecated assets on every resolve
      *
      * @param string $pluginName
      * @return void
      */
-    public static function clean(string $pluginName)
+    public static function clean(string $pluginName): void
     {
         if ($plugin = App::instance()->plugin($pluginName)) {
             $root   = $plugin->root() . '/assets';
@@ -91,7 +54,7 @@ class PluginAssets
      *
      * @param string $pluginName
      * @param string $filename
-     * @return string
+     * @return \Kirby\Cms\Response|null
      */
     public static function resolve(string $pluginName, string $filename)
     {
@@ -104,6 +67,9 @@ class PluginAssets
 
                 $target = $plugin->mediaRoot() . '/' . $filename;
                 $url    = $plugin->mediaUrl() . '/' . $filename;
+
+                // create the plugin directory first
+                Dir::make($plugin->mediaRoot(), true);
 
                 if (F::link($source, $target, 'symlink') === true) {
                     return Response::redirect($url);

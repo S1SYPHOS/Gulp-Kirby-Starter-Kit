@@ -14,13 +14,12 @@ use ParsedownExtra;
  *
  * @package   Kirby Text
  * @author    Bastian Allgeier <bastian@getkirby.com>
- * @link      http://getkirby.com
- * @copyright Bastian Allgeier
- * @license   MIT
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://opensource.org/licenses/MIT
  */
 class Markdown
 {
-
     /**
      * Array with all configured options
      * for the parser
@@ -57,16 +56,16 @@ class Markdown
     /**
      * Parses the given text and returns the HTML
      *
-     * @param  string $text
-     * @param  bool $inline
+     * @param string|null $text
+     * @param bool $inline
      * @return string
      */
-    public function parse(string $text, bool $inline = false): string
+    public function parse(string $text = null, bool $inline = false): string
     {
         if ($this->options['extra'] === true) {
-            $parser = new ParsedownExtra;
+            $parser = new ParsedownExtra();
         } else {
-            $parser = new Parsedown;
+            $parser = new Parsedown();
         }
 
         $parser->setBreaksEnabled($this->options['breaks']);

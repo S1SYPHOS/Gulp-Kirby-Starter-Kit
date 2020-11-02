@@ -2,9 +2,6 @@
 
 namespace Kirby\Cms;
 
-use Kirby\Toolkit\Dir;
-use Kirby\Toolkit\F;
-
 /**
  * Extension of the Collection class that
  * introduces `Roles::factory()` to convert an
@@ -12,12 +9,71 @@ use Kirby\Toolkit\F;
  * collection with Role objects. It also has
  * a `Roles::load()` method that handles loading
  * role definitions from disk.
+ *
+ * @package   Kirby Cms
+ * @author    Bastian Allgeier <bastian@getkirby.com>
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://getkirby.com/license
  */
 class Roles extends Collection
 {
-    public static function factory(array $roles, array $inject = []): self
+    /**
+     * Returns a filtered list of all
+     * roles that can be created by the
+     * current user
+     *
+     * @return self
+     * @throws \Exception
+     */
+    public function canBeChanged()
     {
-        $collection = new static;
+        if (App::instance()->user()) {
+            return $this->filter(function ($role) {
+                $newUser = new User([
+                    'email' => 'test@getkirby.com',
+                    'role'  => $role->id()
+                ]);
+
+                return $newUser->permissions()->can('changeRole');
+            });
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns a filtered list of all
+     * roles that can be created by the
+     * current user
+     *
+     * @return self
+     * @throws \Exception
+     */
+    public function canBeCreated()
+    {
+        if (App::instance()->user()) {
+            return $this->filter(function ($role) {
+                $newUser = new User([
+                    'email' => 'test@getkirby.com',
+                    'role'  => $role->id()
+                ]);
+
+                return $newUser->permissions()->can('create');
+            });
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array $roles
+     * @param array $inject
+     * @return self
+     */
+    public static function factory(array $roles, array $inject = [])
+    {
+        $collection = new static();
 
         // read all user blueprints
         foreach ($roles as $props) {
@@ -34,9 +90,14 @@ class Roles extends Collection
         return $collection->sortBy('name', 'asc');
     }
 
-    public static function load(string $root = null, array $inject = []): self
+    /**
+     * @param string|null $root
+     * @param array $inject
+     * @return self
+     */
+    public static function load(string $root = null, array $inject = [])
     {
-        $roles = new static;
+        $roles = new static();
 
         // load roles from plugins
         foreach (App::instance()->extensions('blueprints') as $blueprintName => $blueprint) {
@@ -55,12 +116,14 @@ class Roles extends Collection
 
         // load roles from directory
         if ($root !== null) {
-            foreach (Dir::read($root) as $filename) {
+            foreach (glob($root . '/*.yml') as $file) {
+                $filename = basename($file);
+
                 if ($filename === 'default.yml') {
                     continue;
                 }
 
-                $role = Role::load($root . '/' . $filename, $inject);
+                $role = Role::load($file, $inject);
                 $roles->set($role->id(), $role);
             }
         }

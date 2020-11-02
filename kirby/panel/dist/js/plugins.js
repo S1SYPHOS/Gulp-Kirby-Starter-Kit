@@ -2,11 +2,14 @@
 window.panel = window.panel || {};
 window.panel.plugins = {
   components: {},
+  created: [],
   fields: {},
+  icons: {},
   sections: {},
   routes: [],
   use: [],
   views: {},
+  thirdParty: {}
 };
 
 window.panel.plugin = function (plugin, parts) {
@@ -20,6 +23,11 @@ window.panel.plugin = function (plugin, parts) {
     window.panel.plugins["fields"][`k-${name}-field`] = options;
   });
 
+  // Icons
+  resolve(parts, "icons", function (name, options) {
+    window.panel.plugins["icons"][name] = options;
+  });
+
   // Sections
   resolve(parts, "sections", function (name, options) {
     window.panel.plugins["sections"][`k-${name}-section`] = options;
@@ -30,10 +38,26 @@ window.panel.plugin = function (plugin, parts) {
     window.panel.plugins["use"].push(options);
   });
 
+  // created callback
+  if (parts["created"]) {
+    window.panel.plugins["created"].push(parts["created"]);
+  }
+
   // Views
   resolve(parts, "views", function (name, options) {
     window.panel.plugins["views"][name] = options;
   });
+
+  // Login
+  if (parts.login) {
+    window.panel.plugins.login = parts.login;
+  }
+
+  // Third-party plugins
+  resolve(parts, "thirdParty", function(name, options) {
+    window.panel.plugins["thirdParty"][name] = options;
+  });
+
 };
 
 function resolve(object, type, callback) {

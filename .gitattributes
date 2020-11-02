@@ -1,0 +1,8 @@
+# Normalize line endings automatically
+* text=auto
+
+# Git stuff
+README.md export-ignore
+
+# PHP != Hacklang
+*.php linguist-language=PHP

@@ -23,6 +23,9 @@ return [
         'email' => function (User $user) {
             return $user->email();
         },
+        'files' => function (User $user) {
+            return $user->files()->sortBy('sort', 'asc', 'filename', 'asc');
+        },
         'id' => function (User $user) {
             return $user->id();
         },
@@ -36,7 +39,7 @@ return [
             return $user->next();
         },
         'options' => function (User $user) {
-            return $user->permissions()->toArray();
+            return $user->panelOptions();
         },
         'permissions' => function (User $user) {
             return $user->role()->permissions()->toArray();
@@ -47,11 +50,14 @@ return [
         'role' => function (User $user) {
             return $user->role();
         },
+        'roles' => function (User $user) {
+            return $user->roles();
+        },
         'username' => function (User $user) {
             return $user->username();
         }
     ],
-    'type'  => User::class,
+    'type'  => 'Kirby\Cms\User',
     'views' => [
         'default' => [
             'avatar',

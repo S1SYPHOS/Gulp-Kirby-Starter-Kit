@@ -1,7 +1,5 @@
 <?php
 
-use Kirby\Exception\InvalidArgumentException;
-
 /**
  * Page Routes
  */
@@ -29,10 +27,28 @@ return [
         }
     ],
     [
+        'pattern' => 'pages/(:any)/blueprint',
+        'method'  => 'GET',
+        'action'  => function (string $id) {
+            return $this->page($id)->blueprint();
+        }
+    ],
+    [
+        'pattern' => [
+            'pages/(:any)/blueprints',
+            // Deprecated: remove in 3.6.0
+            'pages/(:any)/children/blueprints',
+        ],
+        'method'  => 'GET',
+        'action'  => function (string $id) {
+            return $this->page($id)->blueprints($this->requestQuery('section'));
+        }
+    ],
+    [
         'pattern' => 'pages/(:any)/children',
         'method'  => 'GET',
         'action'  => function (string $id) {
-            return $this->page($id)->children();
+            return $this->pages($id, $this->requestQuery('status'));
         }
     ],
     [
@@ -43,23 +59,20 @@ return [
         }
     ],
     [
-        'pattern' => 'pages/(:any)/children/blueprints',
-        'method'  => 'GET',
-        'action'  => function (string $id) {
-            return $this->page($id)->blueprints($this->requestQuery('section'));
-        }
-    ],
-    [
         'pattern' => 'pages/(:any)/children/search',
         'method'  => 'GET|POST',
         'action'  => function (string $id) {
-            $pages = $this->page($id)->children();
-
-            if ($this->requestMethod() === 'GET') {
-                return $pages->search($this->requestQuery('q'));
-            } else {
-                return $pages->query($this->requestBody());
-            }
+            return $this->searchPages($id);
+        }
+    ],
+    [
+        'pattern' => 'pages/(:any)/duplicate',
+        'method'  => 'POST',
+        'action'  => function (string $id) {
+            return $this->page($id)->duplicate($this->requestBody('slug'), [
+                'children' => $this->requestBody('children'),
+                'files'    => $this->requestBody('files'),
+            ]);
         }
     ],
     [

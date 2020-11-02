@@ -3,17 +3,16 @@
 namespace Kirby\Cache;
 
 /**
-* Memcached Driver
-*
-* @package   Kirby Cache
-* @author    Bastian Allgeier <bastian@getkirby.com>
-* @link      http://getkirby.com
-* @copyright Bastian Allgeier
-* @license   MIT
-*/
+ * Memcached Driver
+ *
+ * @package   Kirby Cache
+ * @author    Bastian Allgeier <bastian@getkirby.com>
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://opensource.org/licenses/MIT
+ */
 class MemCached extends Cache
 {
-
     /**
      * store for the memache connection
      * @var Memcached
@@ -21,12 +20,13 @@ class MemCached extends Cache
     protected $connection;
 
     /**
-     * Set all parameters which are needed for the memcache client
-     * see defaults for available parameters
+     * Sets all parameters which are needed to connect to Memcached
      *
-     * @param array $params
+     * @param array $options 'host'   (default: localhost)
+     *                       'port'   (default: 11211)
+     *                       'prefix' (default: null)
      */
-    public function __construct(array $params = [])
+    public function __construct(array $options = [])
     {
         $defaults = [
             'host'    => 'localhost',
@@ -34,47 +34,37 @@ class MemCached extends Cache
             'prefix'  => null,
         ];
 
-        parent::__construct(array_merge($defaults, $params));
+        parent::__construct(array_merge($defaults, $options));
 
         $this->connection = new \Memcached();
         $this->connection->addServer($this->options['host'], $this->options['port']);
     }
 
     /**
-     * Write an item to the cache for a given number of minutes.
+     * Writes an item to the cache for a given number of minutes and
+     * returns whether the operation was successful
      *
      * <code>
-     *    // Put an item in the cache for 15 minutes
-     *    Cache::set('value', 'my value', 15);
+     *   // put an item in the cache for 15 minutes
+     *   $cache->set('value', 'my value', 15);
      * </code>
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  int     $minutes
-     * @return void
+     * @param string $key
+     * @param mixed $value
+     * @param int $minutes
+     * @return bool
      */
-    public function set(string $key, $value, int $minutes = 0)
+    public function set(string $key, $value, int $minutes = 0): bool
     {
-        return $this->connection->set($this->key($key), $this->value($value, $minutes)->toJson(), $this->expiration($minutes));
+        return $this->connection->set($this->key($key), (new Value($value, $minutes))->toJson(), $this->expiration($minutes));
     }
 
     /**
-     * Returns the full keyname
-     * including the prefix (if set)
+     * Internal method to retrieve the raw cache value;
+     * needs to return a Value object or null if not found
      *
-     * @param  string $key
-     * @return string
-     */
-    public function key(string $key): string
-    {
-        return $this->options['prefix'] . $key;
-    }
-
-    /**
-     * Retrieve the CacheValue object from the cache.
-     *
-     * @param  string  $key
-     * @return object  CacheValue
+     * @param string $key
+     * @return \Kirby\Cache\Value|null
      */
     public function retrieve(string $key)
     {
@@ -82,10 +72,11 @@ class MemCached extends Cache
     }
 
     /**
-     * Remove an item from the cache
+     * Removes an item from the cache and returns
+     * whether the operation was successful
      *
-     * @param  string  $key
-     * @return boolean
+     * @param string $key
+     * @return bool
      */
     public function remove(string $key): bool
     {
@@ -93,42 +84,11 @@ class MemCached extends Cache
     }
 
     /**
-     * Checks when an item in the cache expires
+     * Flushes the entire cache and returns
+     * whether the operation was successful;
+     * WARNING: Memcached only supports flushing the whole cache at once!
      *
-     * @param  string $key
-     * @return int
-     */
-    public function expires(string $key): int
-    {
-        return parent::expires($this->key($key));
-    }
-
-    /**
-     * Checks if an item in the cache is expired
-     *
-     * @param  string $key
-     * @return boolean
-     */
-    public function expired(string $key): bool
-    {
-        return parent::expired($this->key($key));
-    }
-
-    /**
-     * Checks when the cache has been created
-     *
-     * @param  string $key
-     * @return int
-     */
-    public function created(string $key): int
-    {
-        return parent::created($this->key($key));
-    }
-
-    /**
-     * Flush the entire cache directory
-     *
-     * @return boolean
+     * @return bool
      */
     public function flush(): bool
     {

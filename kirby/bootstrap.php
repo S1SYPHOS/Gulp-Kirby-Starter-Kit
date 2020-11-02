@@ -2,9 +2,12 @@
 
 /**
  * Validate the PHP version to already
- * stop at older versions
+ * stop at older or too recent versions
  */
-if (version_compare(phpversion(), '7.1.0', '>=') === false) {
+if (
+    version_compare(PHP_VERSION, '7.2.0', '>=') === false ||
+    version_compare(PHP_VERSION, '7.5.0', '<')  === false
+) {
     die(include __DIR__ . '/views/php.php');
 }
 
@@ -25,10 +28,8 @@ if (is_file($autoloader = dirname(__DIR__) . '/vendor/autoload.php')) {
 } else {
 
     /**
-     * If neither one exists, don't bother searching
+     * If neither one exists, don't bother searching;
      * it's a custom directory setup and the users need to
      * load the autoloader themselves
      */
 }
-
-define('DS', '/');

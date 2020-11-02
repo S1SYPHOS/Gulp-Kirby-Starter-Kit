@@ -1,8 +1,8 @@
 <?php
 
 return [
-  'environment' => 'development',
+    'environment' => 'development',
 
-  # Activating debug mode
-  'debug' => true,
+    # Activating debug mode
+    'debug' => true,
 ];

@@ -1,145 +1,242 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bnomei;
 
-use \Kirby\Cms;
-use \Kirby\Toolkit;
+use Kirby\Cms\Url;
+use Kirby\Exception\InvalidArgumentException;
+use Kirby\Toolkit\A;
+use function array_key_exists;
 
-class Fingerprint
+final class Fingerprint
 {
-    public static function css($url, $attrs = [])
+    /**
+     * @var array
+     */
+    private $options;
+
+    /**
+     * Fingerprint constructor.
+     * @param array $options
+     */
+    public function __construct(array $options = [])
     {
-        if ($url === '@auto') {
-            if ($assetUrl = \Kirby\Cms\Url::toTemplateAsset('css/templates', 'css')) {
-                $url = $assetUrl;
+        $defaults = [
+            'debug' => option('debug'),
+            'query' => option('bnomei.fingerprint.query'),
+            'hash' => option('bnomei.fingerprint.hash'),
+            'integrity' => option('bnomei.fingerprint.integrity'),
+            'https' => option('bnomei.fingerprint.https'),
+        ];
+        $this->options = array_merge($defaults, $options);
+
+        foreach ($this->options as $key => $call) {
+            if (is_callable($call) && !in_array($key, ['hash', 'integrity'])) {
+                $this->options[$key] = $call();
             }
         }
-        $fingerprint = static::process($url);
-        $sri = \Kirby\Toolkit\A::get($attrs, 'integrity', false);
-        if ($sri === true) {
-            $sri = $fingerprint['integrity'];
-        }
-        if ($sri && strlen($sri) > 0) {
-            $attrs['integrity'] = $sri;
-            $attrs['crossorigin'] = \Kirby\Toolkit\A::get($attrs, 'crossorigin', 'anonymous');
-        } elseif (\Kirby\Toolkit\A::get($attrs, 'integrity')) {
-            unset($attrs[array_search('integrity', $attrs)]);
-        }
 
-        return static::ssl(\css($fingerprint['hash'], $attrs));
-    }
-
-    public static function js($url, $attrs = [])
-    {
-        if ($url === '@auto') {
-            if ($assetUrl = \Kirby\Cms\Url::toTemplateAsset('js/templates', 'js')) {
-                $url = $assetUrl;
-            }
-        }
-        $fingerprint = static::process($url);
-        $sri = \Kirby\Toolkit\A::get($attrs, 'integrity', false);
-        if ($sri === true) {
-            $sri = $fingerprint['integrity'];
-        }
-        if ($sri && strlen($sri) > 0) {
-            $attrs['integrity'] = $sri;
-            $attrs['crossorigin'] = \Kirby\Toolkit\A::get($attrs, 'crossorigin', 'anonymous');
-        } elseif (\Kirby\Toolkit\A::get($attrs, 'integrity')) {
-            unset($attrs[array_search('integrity', $attrs)]);
-        }
-
-        return static::ssl(\js($fingerprint['hash'], $attrs));
-    }
-
-    public static function process($file)
-    {
-        $needsPush = false;
-        $key = null;
-        $root = null;
-        $mod = null;
-        $sri = null;
-        $url = null;
-
-        if (option('debug') && option('bnomei.fingerprint.debugforce')) {
+        if ($this->option('debug')) {
             kirby()->cache('bnomei.fingerprint')->flush();
         }
+    }
 
-        $cacheWithVersion = 'lookup' . str_replace('.', '', kirby()->plugin('bnomei/fingerprint')->version()) . '-' . md5(site()->url());
-        $lookup = kirby()->cache('bnomei.fingerprint')->get($cacheWithVersion);
-        if (!$lookup) {
+    /**
+     * @param string|null $key
+     * @return array|mixed
+     */
+    public function option(?string $key = null)
+    {
+        if ($key) {
+            return A::get($this->options, $key);
+        }
+        return $this->options;
+    }
+
+    /**
+     * @param string $option
+     * @param $file
+     * @return mixed|null
+     */
+    public function apply(string $option, $file)
+    {
+        $callback = $this->option($option);
+
+        if ($callback && is_callable($callback)) {
+            if ($option === 'integrity') {
+                return call_user_func_array($callback, [$file]);
+            } elseif ($option === 'hash') {
+                return call_user_func_array($callback, [$file, $this->option('query')]);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param $url
+     * @return mixed
+     */
+    public function https($url)
+    {
+        if ($this->option('https')) {
+            $url = str_replace('http://', 'https://', $url);
+        }
+        return $url;
+    }
+
+    /**
+     * @param $file
+     * @return mixed
+     * @throws InvalidArgumentException
+     */
+    public function process($file)
+    {
+        $needsPush = false;
+        $lookup = $this->read();
+        if (! $lookup) {
             $lookup = [];
             $needsPush = true;
         }
-        if (is_a($file, 'Kirby\CMS\File') || is_a($file, 'Kirby\CMS\FileVersion')) {
-            $key = (string)$file->id();
-            $root = (string)$file->root();
-            $mod = \filemtime($root);
-            $url = static::ssl((string)$file->url());
-        } elseif (!\Kirby\Toolkit\V::url($file)) {
-            $key = ltrim($file, '/');
-            $root = kirby()->roots()->index() . DIRECTORY_SEPARATOR . $key;
-            if (\Kirby\Toolkit\F::exists($root)) {
-                $mod = \filemtime($root);
-                $url = static::ssl(\url($key));
-            }
-        } else {
-            $key = $file;
-        }
 
-        if (\array_key_exists($key, $lookup)) {
-            if ($mod && $lookup[$key]['modified'] < $mod) {
-                $needsPush = true;
-            }
-        } else {
+        $finFile = new FingerprintFile($file);
+        $id = $finFile->id();
+        $mod = $finFile->modified();
+
+        if (! array_key_exists($id, $lookup)) {
+            $needsPush = true;
+        } elseif ($mod && $lookup[$id]['modified'] < $mod) {
             $needsPush = true;
         }
 
         if ($needsPush) {
-            $lookup[$key] = [
+            $lookup[$id] = [
                 'modified' => $mod,
-                'root' => $root,
-                'integrity' => null,
-                'hash' => $url,
+                'root' => $finFile->fileRoot(),
+                'integrity' => $this->apply('integrity', $file),
+                'hash' => $this->apply('hash', $file),
             ];
 
-            $lookup[$key]['integrity'] = static::sriFile($file);
-            $lookup[$key]['hash'] = static::hashFile($file);
-            
-            kirby()->cache('bnomei.fingerprint')->set($cacheWithVersion, $lookup);
+            $this->write($lookup);
         }
 
-        return \Kirby\Toolkit\A::get($lookup, $key);
+        return A::get($lookup, $id);
     }
 
-    private static function hashFile($file)
+    /**
+     * @param array $attrs
+     * @param array $lookup
+     * @return array
+     */
+    public function attrs(array $attrs, array $lookup)
     {
-        $callback = option('bnomei.fingerprint.hash', null);
-
-        if ($callback && is_callable($callback)) {
-            return call_user_func_array($callback, [$file]);
+        $sri = A::get($attrs, 'integrity', false);
+        if ($sri === true) {
+            $sri = A::get($lookup, 'integrity');
         }
-        return null;
+        if ($sri && strlen($sri) > 0) {
+            $attrs['integrity'] = $sri;
+            $attrs['crossorigin'] = A::get($attrs, 'crossorigin', 'anonymous');
+        } elseif (! $sri) {
+            if (array_key_exists('integrity', $attrs)) {
+                unset($attrs['integrity']);
+            }
+            if (array_key_exists('crossorigin', $attrs)) {
+                unset($attrs['crossorigin']);
+            }
+        }
+        return $attrs;
     }
 
-    private static function sriFile($file)
+    /**
+     * @param string $extension
+     * @param string $url
+     * @param array $attrs
+     * @return string|null
+     */
+    public function helper(string $extension, string $url, array $attrs = []): ?string
     {
-        $callback = option('bnomei.fingerprint.integrity', null);
-
-        if ($callback && is_callable($callback)) {
-            return call_user_func_array($callback, [$file]);
+        if(! is_callable($extension)) {
+            return null;
         }
-        return null;
+
+        if ($url === '@auto') {
+            $assetUrl = Url::toTemplateAsset($extension.'/templates', $extension);
+            if ($assetUrl) {
+                $url = $assetUrl;
+            }
+        }
+
+        $lookup = $this->process($url);
+        $attrs = $this->attrs($attrs, $lookup);
+
+        return $this->https($extension($lookup['hash'], $attrs));
     }
 
-    private static function ssl($url)
+    /**
+     * @return string
+     */
+    public function cacheKey(): string
     {
-        $callback = option('bnomei.fingerprint.ssl', null);
-        if ($callback && is_callable($callback)) {
-            $callback = $callback();
+        return implode('-', [
+            'lookup',
+            str_replace('.', '-', kirby()->plugin('bnomei/fingerprint')->version()),
+            $this->option('query') ? 'query' : 'redirect'
+        ]);
+    }
+
+    /**
+     * @return array|null
+     */
+    public function read(): ?array
+    {
+        if ($this->option('debug')) {
+            return null;
         }
-        if ($callback) {
-            $url = str_replace('http://', 'https://', $url);
+        return kirby()->cache('bnomei.fingerprint')->get($this->cacheKey());
+    }
+
+    /**
+     * @param array $lookup
+     * @return bool
+     */
+    private function write(array $lookup): bool
+    {
+        if ($this->option('debug')) {
+            return false;
         }
-        return $url;
+        return kirby()->cache('bnomei.fingerprint')->set($this->cacheKey(), $lookup);
+    }
+
+    /**
+     * @param $url
+     * @param array $attrs
+     * @return mixed
+     */
+    public static function css($url, $attrs = []): string
+    {
+        return (new Fingerprint())->helper('css', $url, $attrs);
+    }
+
+    /**
+     * @param $url
+     * @param array $attrs
+     * @return mixed
+     */
+    public static function js($url, $attrs = []): string
+    {
+        return (new Fingerprint())->helper('js', $url, $attrs);
+    }
+
+    /**
+     * @param $url
+     * @param array $attrs
+     * @return mixed
+     */
+    public static function url($url): string
+    {
+        $fingerprint = new Fingerprint();
+        $url = $fingerprint->process($url)['hash'];
+        return $fingerprint->https($url);
     }
 }

@@ -3,18 +3,16 @@
 namespace Kirby\Http;
 
 use Closure;
-use Exception;
 
 /**
  * @package   Kirby Http
  * @author    Bastian Allgeier <bastian@getkirby.com>
- * @link      http://getkirby.com
- * @copyright Bastian Allgeier
- * @license   MIT
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://opensource.org/licenses/MIT
  */
 class Route
 {
-
     /**
      * The callback action function
      *
@@ -92,7 +90,8 @@ class Route
      *
      * @param string|array $pattern
      * @param string|array $method
-     * @param Closure      $action
+     * @param Closure $action
+     * @param array $attributes
      */
     public function __construct($pattern, $method = 'GET', Closure $action, array $attributes = [])
     {
@@ -107,7 +106,7 @@ class Route
      *
      * @return Closure
      */
-    public function action(): Closure
+    public function action()
     {
         return $this->action;
     }
@@ -117,7 +116,7 @@ class Route
      *
      * @return array
      */
-    public function arguments()
+    public function arguments(): array
     {
         return $this->arguments;
     }
@@ -159,7 +158,7 @@ class Route
      *
      * @return void
      */
-    public function next()
+    public static function next(): void
     {
         throw new Exceptions\NextRouteException('next');
     }
@@ -178,7 +177,7 @@ class Route
      * Converts the pattern into a full regular
      * expression by replacing all the wildcards
      *
-     * @param  string $pattern
+     * @param string $pattern
      * @return string
      */
     public function regex(string $pattern): string
@@ -202,8 +201,8 @@ class Route
      * Tries to match the path with the regular expression and
      * extracts all arguments for the Route action
      *
-     * @param  string       $pattern
-     * @param  string       $path
+     * @param string $pattern
+     * @param string $path
      * @return array|false
      */
     public function parse(string $pattern, string $path)

@@ -3,16 +3,22 @@
 namespace Kirby\Cms;
 
 use Closure;
-use Kirby\Data\Data;
 use Kirby\Exception\InvalidArgumentException;
 use Kirby\Exception\LogicException;
 use Kirby\Image\Image;
 use Kirby\Toolkit\F;
-use Kirby\Toolkit\Str;
 
+/**
+ * FileActions
+ *
+ * @package   Kirby Cms
+ * @author    Bastian Allgeier <bastian@getkirby.com>
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://getkirby.com/license
+ */
 trait FileActions
 {
-
     /**
      * Renames the file without touching the extension
      * The store is used to actually execute this.
@@ -20,8 +26,9 @@ trait FileActions
      * @param string $name
      * @param bool $sanitize
      * @return self
+     * @throws \Kirby\Exception\LogicException
      */
-    public function changeName(string $name, bool $sanitize = true): self
+    public function changeName(string $name, bool $sanitize = true)
     {
         if ($sanitize === true) {
             $name = F::safeName($name);
@@ -32,7 +39,7 @@ trait FileActions
             return $this;
         }
 
-        return $this->commit('changeName', [$this, $name], function ($oldFile, $name) {
+        return $this->commit('changeName', ['file' => $this, 'name' => $name], function ($oldFile, $name) {
             $newFile = $oldFile->clone([
                 'filename' => $name . '.' . $oldFile->extension(),
             ]);
@@ -43,6 +50,11 @@ trait FileActions
 
             if ($newFile->exists() === true) {
                 throw new LogicException('The new file exists and cannot be overwritten');
+            }
+
+            // remove the lock of the old file
+            if ($lock = $oldFile->lock()) {
+                $lock->remove();
             }
 
             // remove all public versions
@@ -71,12 +83,12 @@ trait FileActions
     /**
      * Changes the file's sorting number in the meta file
      *
-     * @param integer $sort
+     * @param int $sort
      * @return self
      */
     public function changeSort(int $sort)
     {
-        return $this->commit('changeSort', [$this, $sort], function ($file, $sort) {
+        return $this->commit('changeSort', ['file' => $this, 'position' => $sort], function ($file, $sort) {
             return $file->save(['sort' => $sort]);
         });
     }
@@ -97,15 +109,49 @@ trait FileActions
      */
     protected function commit(string $action, array $arguments, Closure $callback)
     {
-        $old   = $this->hardcopy();
-        $kirby = $this->kirby();
+        $old            = $this->hardcopy();
+        $kirby          = $this->kirby();
+        $argumentValues = array_values($arguments);
 
-        $this->rules()->$action(...$arguments);
-        $kirby->trigger('file.' . $action . ':before', ...$arguments);
-        $result = $callback(...$arguments);
-        $kirby->trigger('file.' . $action . ':after', $result, $old);
+        $this->rules()->$action(...$argumentValues);
+        $kirby->trigger('file.' . $action . ':before', $arguments);
+
+        $result = $callback(...$argumentValues);
+
+        if ($action === 'create') {
+            $argumentsAfter = ['file' => $result];
+        } elseif ($action === 'delete') {
+            $argumentsAfter = ['status' => $result, 'file' => $old];
+        } else {
+            $argumentsAfter = ['newFile' => $result, 'oldFile' => $old];
+        }
+        $kirby->trigger('file.' . $action . ':after', $argumentsAfter);
+
         $kirby->cache('pages')->flush();
         return $result;
+    }
+
+    /**
+     * Copy the file to the given page
+     *
+     * @param \Kirby\Cms\Page $page
+     * @return \Kirby\Cms\File
+     */
+    public function copy(Page $page)
+    {
+        F::copy($this->root(), $page->root() . '/' . $this->filename());
+
+        if ($this->kirby()->multilang() === true) {
+            foreach ($this->kirby()->languages() as $language) {
+                $contentFile = $this->contentFile($language->code());
+                F::copy($contentFile, $page->root() . '/' . basename($contentFile));
+            }
+        } else {
+            $contentFile = $this->contentFile();
+            F::copy($contentFile, $page->root() . '/' . basename($contentFile));
+        }
+
+        return $page->clone()->file($this->filename());
     }
 
     /**
@@ -116,8 +162,10 @@ trait FileActions
      *
      * @param array $props
      * @return self
+     * @throws \Kirby\Exception\InvalidArgumentException
+     * @throws \Kirby\Exception\LogicException
      */
-    public static function create(array $props): self
+    public static function create(array $props)
     {
         if (isset($props['source'], $props['parent']) === false) {
             throw new InvalidArgumentException('Please provide the "source" and "parent" props for the File');
@@ -126,8 +174,10 @@ trait FileActions
         // prefer the filename from the props
         $props['filename'] = F::safeName($props['filename'] ?? basename($props['source']));
 
+        $props['model'] = strtolower($props['template'] ?? 'default');
+
         // create the basic file and a test upload object
-        $file   = new static($props);
+        $file = static::factory($props);
         $upload = new Image($props['source']);
 
         // create a form for the file
@@ -139,7 +189,7 @@ trait FileActions
         $file = $file->clone(['content' => $form->strings(true)]);
 
         // run the hook
-        return $file->commit('create', [$file, $upload], function ($file, $upload) {
+        return $file->commit('create', compact('file', 'upload'), function ($file, $upload) {
 
             // delete all public versions
             $file->unpublish();
@@ -175,8 +225,15 @@ trait FileActions
      */
     public function delete(): bool
     {
-        return $this->commit('delete', [$this], function ($file) {
+        return $this->commit('delete', ['file' => $this], function ($file) {
+
+            // remove all versions in the media folder
             $file->unpublish();
+
+            // remove the lock of the old file
+            if ($lock = $file->lock()) {
+                $lock->remove();
+            }
 
             if ($file->kirby()->multilang() === true) {
                 foreach ($file->translations() as $translation) {
@@ -188,6 +245,9 @@ trait FileActions
 
             F::remove($file->root());
 
+            // remove the file from the sibling collection
+            $file->parent()->files()->remove($file);
+
             return true;
         });
     }
@@ -198,22 +258,24 @@ trait FileActions
      *
      * @return self
      */
-    public function publish(): self
+    public function publish()
     {
-        Media::publish($this->root(), $this->mediaRoot());
+        Media::publish($this, $this->mediaRoot());
         return $this;
     }
 
     /**
-     * Alias for changeName
-     * @deprecated
+     * @deprecated 3.0.0 Use `File::changeName()` instead
      *
      * @param string $name
      * @param bool $sanitize
      * @return self
+     * @codeCoverageIgnore
      */
     public function rename(string $name, bool $sanitize = true)
     {
+        deprecated('$file->rename() is deprecated, use $file->changeName() instead. $file->rename() will be removed in Kirby 3.5.0.');
+
         return $this->changeName($name, $sanitize);
     }
 
@@ -226,10 +288,11 @@ trait FileActions
      *
      * @param string $source
      * @return self
+     * @throws \Kirby\Exception\LogicException
      */
-    public function replace(string $source): self
+    public function replace(string $source)
     {
-        return $this->commit('replace', [$this, new Image($source)], function ($file, $upload) {
+        return $this->commit('replace', ['file' => $this, 'upload' => new Image($source)], function ($file, $upload) {
 
             // delete all public versions
             $file->unpublish();
@@ -249,9 +312,9 @@ trait FileActions
      *
      * @return self
      */
-    public function unpublish(): self
+    public function unpublish()
     {
-        Media::unpublish($this->parent()->mediaRoot(), $this->filename());
+        Media::unpublish($this->parent()->mediaRoot(), $this);
         return $this;
     }
 }

@@ -9,25 +9,24 @@ namespace Kirby\Toolkit;
  *
  * @package   Kirby Toolkit
  * @author    Bastian Allgeier <bastian@getkirby.com>
- * @link      http://getkirby.com
- * @copyright Bastian Allgeier
- * @license   http://www.opensource.org/licenses/mit-license.php MIT License
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://opensource.org/licenses/MIT
  */
 class Silo
 {
-
     /**
      * @var array
      */
     public static $data = [];
 
     /**
-    * Setter for new data.
-    *
-    * @param string|array $key
-    * @param mixed $value
-    * @return array
-    */
+     * Setter for new data.
+     *
+     * @param string|array $key
+     * @param mixed $value
+     * @return array
+     */
     public static function set($key, $value = null): array
     {
         if (is_array($key) === true) {

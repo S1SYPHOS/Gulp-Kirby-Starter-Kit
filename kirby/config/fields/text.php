@@ -1,14 +1,13 @@
 <?php
 
 use Kirby\Exception\InvalidArgumentException;
-use Kirby\Toolkit\I18n;
 use Kirby\Toolkit\Str;
 
 return [
     'props' => [
 
         /**
-         * The field value will be converted with the selected converter before the value gets saved. Available converters: lower, upper, ucfirst, slug
+         * The field value will be converted with the selected converter before the value gets saved. Available converters: `lower`, `upper`, `ucfirst`, `slug`
          */
         'converter' => function ($value = null) {
             if ($value !== null && in_array($value, array_keys($this->converters())) === false) {
@@ -50,7 +49,7 @@ return [
         },
 
         /**
-         * If false, spellcheck will be switched off
+         * If `false`, spellcheck will be switched off
          */
         'spellcheck' => function (bool $spellcheck = false) {
             return $spellcheck;
@@ -98,6 +97,7 @@ return [
     ],
     'validations' => [
         'minlength',
-        'maxlength'
+        'maxlength',
+        'pattern'
     ]
 ];

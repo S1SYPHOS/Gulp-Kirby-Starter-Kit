@@ -4,13 +4,18 @@ namespace Kirby\Cms;
 
 use Exception;
 use Kirby\Data\Data;
-use Kirby\Exception\NotFoundException;
 use Kirby\Toolkit\F;
 use Kirby\Toolkit\I18n;
 
 /**
  * Represents a User role with attached
  * permissions. Roles are defined by user blueprints.
+ *
+ * @package   Kirby Cms
+ * @author    Bastian Allgeier <bastian@getkirby.com>
+ * @link      https://getkirby.com
+ * @copyright Bastian Allgeier GmbH
+ * @license   https://getkirby.com/license
  */
 class Role extends Model
 {
@@ -25,20 +30,27 @@ class Role extends Model
     }
 
     /**
-     * Improved var_dump() output
+     * Improved `var_dump` output
      *
      * @return array
      */
-    public function __debuginfo(): array
+    public function __debugInfo(): array
     {
         return $this->toArray();
     }
 
+    /**
+     * @return string
+     */
     public function __toString(): string
     {
         return $this->name();
     }
 
+    /**
+     * @param array $inject
+     * @return self
+     */
     public static function admin(array $inject = [])
     {
         try {
@@ -48,50 +60,75 @@ class Role extends Model
         }
     }
 
-    protected static function defaults()
+    /**
+     * @return array
+     */
+    protected static function defaults(): array
     {
         return [
             'admin' => [
-                'description' => 'The admin has all rights',
                 'name'        => 'admin',
-                'title'       => 'Admin',
+                'description' => I18n::translate('role.admin.description'),
+                'title'       => I18n::translate('role.admin.title'),
                 'permissions' => true,
             ],
             'nobody' => [
-                'description' => 'This is a fallback role without any permissions',
                 'name'        => 'nobody',
-                'title'       => 'Nobody',
+                'description' => I18n::translate('role.nobody.description'),
+                'title'       => I18n::translate('role.nobody.title'),
                 'permissions' => false,
             ]
         ];
     }
 
+    /**
+     * @return mixed
+     */
     public function description()
     {
         return $this->description;
     }
 
-    public static function factory(array $props, array $inject = []): self
+    /**
+     * @param array $props
+     * @param array $inject
+     * @return self
+     */
+    public static function factory(array $props, array $inject = [])
     {
         return new static($props + $inject);
     }
 
+    /**
+     * @return string
+     */
     public function id(): string
     {
         return $this->name();
     }
 
+    /**
+     * @return bool
+     */
     public function isAdmin(): bool
     {
         return $this->name() === 'admin';
     }
 
+    /**
+     * @return bool
+     */
     public function isNobody(): bool
     {
         return $this->name() === 'nobody';
     }
 
-    public static function load(string $file, array $inject = []): self
+    /**
+     * @param string $file
+     * @param array $inject
+     * @return self
+     */
+    public static function load(string $file, array $inject = [])
     {
         $data = Data::read($file);
         $data['name'] = F::name($file);
@@ -99,11 +136,18 @@ class Role extends Model
         return static::factory($data, $inject);
     }
 
+    /**
+     * @return string
+     */
     public function name(): string
     {
         return $this->name;
     }
 
+    /**
+     * @param array $inject
+     * @return self
+     */
     public static function nobody(array $inject = [])
     {
         try {
@@ -113,35 +157,57 @@ class Role extends Model
         }
     }
 
-    public function permissions(): Permissions
+    /**
+     * @return \Kirby\Cms\Permissions
+     */
+    public function permissions()
     {
         return $this->permissions;
     }
 
-    protected function setDescription($description = null): self
+    /**
+     * @param [type] $description
+     * @return self
+     */
+    protected function setDescription($description = null)
     {
         $this->description = I18n::translate($description, $description);
         return $this;
     }
 
-    protected function setName(string $name): self
+    /**
+     * @param string $name
+     * @return self
+     */
+    protected function setName(string $name)
     {
         $this->name = $name;
         return $this;
     }
 
-    protected function setPermissions($permissions = null): self
+    /**
+     * @param [type] $permissions
+     * @return self
+     */
+    protected function setPermissions($permissions = null)
     {
         $this->permissions = new Permissions($permissions);
         return $this;
     }
 
-    protected function setTitle($title = null): self
+    /**
+     * @param [type] $title
+     * @return self
+     */
+    protected function setTitle($title = null)
     {
         $this->title = I18n::translate($title, $title);
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function title(): string
     {
         return $this->title = $this->title ?? ucfirst($this->name());
