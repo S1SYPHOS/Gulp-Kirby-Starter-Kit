@@ -13,6 +13,7 @@ Icon
 # Temporary files
 # ---------------
 
+/package-lock.json
 /composer.lock
 /yarn.lock
 
